@@ -415,9 +415,9 @@ const SKILLS = [
 ];
 
 const TESTIMONIALS = [
-  { name: "Amara Osei", company: "QuickMart Kenya", avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=120&q=80", quote: "NeuroSpark built us an AI agent that handles 80% of our customer queries automatically. Our team now focuses on growth, not repetitive tasks. Paul and his team are simply world-class." },
-  { name: "Fatima Hassan", company: "Nairobi Digital Co.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80", quote: "Our website traffic tripled within 4 months of engaging NeuroSpark for SEO. The results speak for themselves. Highly professional, data-driven, and always delivering on their promises." },
-  { name: "David Kiprono", company: "AfriFinance Ltd.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80", quote: "The website NeuroSpark designed for us is stunning and converts incredibly well. Paul understood our vision from day one and brought it to life beyond expectations. A true partner." },
+  { name: "Amara Osei", company: "QuickMart Kenya", avatar: "https://images.unsplash.com/photo-1507152832244-10d45c7eda57?w=120&q=80", quote: "NeuroSpark built us an AI agent that handles 80% of our customer queries automatically. Our team now focuses on growth, not repetitive tasks. Paul and his team are simply world-class." },
+  { name: "Fatima Hassan", company: "Nairobi Digital Co.", avatar: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&q=80", quote: "Our website traffic tripled within 4 months of engaging NeuroSpark for SEO. The results speak for themselves. Highly professional, data-driven, and always delivering on their promises." },
+  { name: "David Kiprono", company: "AfriFinance Ltd.", avatar: "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?w=120&q=80", quote: "The website NeuroSpark designed for us is stunning and converts incredibly well. Paul understood our vision from day one and brought it to life beyond expectations. A true partner." },
 ];
 
 const SKILLS_BARS = [
@@ -784,7 +784,7 @@ export default function PaulNyangwaraPortfolio() {
               </p>
 
               {[
-                { icon: "📧", label: "Email", value: "hello@neurospark.co.ke" },
+                { icon: "📧", label: "Email", value: "pnyangwara@gmail.com" },
                 { icon: "📞", label: "Phone", value: "+254 799 644 100" },
                 { icon: "📍", label: "Location", value: "Nairobi, Kenya 🇰🇪" },
               ].map(({ icon, label, value }) => (

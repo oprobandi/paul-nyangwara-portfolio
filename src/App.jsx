@@ -74,7 +74,7 @@ function NotFoundPage() {
 
       <div style={{ position:"relative", zIndex:1, minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 24px", animation:"fadeInUp 0.8s ease both" }}>
         <Link to="/" style={{ textDecoration:"none", marginBottom:48, display:"flex", alignItems:"center", gap:10 }}>
-          <span style={{ fontSize:24 }}>⚡</span>
+          <img src="/neurospark-logo.jpg" alt="NeuroSpark" style={{ width:36, height:36, borderRadius:"50%", objectFit:"cover" }} />
           <span style={{ fontFamily:"'Playfair Display',serif", color:"white", fontSize:22, fontWeight:700 }}>
             Paul <span style={{ color:GOLD }}>Nyang'wara</span>
           </span>

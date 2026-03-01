@@ -112,7 +112,7 @@ export default function Navbar() {
       }}>
         {/* Logo */}
         <Link to="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <span style={{ fontSize: 24 }}>⚡</span>
+          <img src="/paul-headshot.jpg" alt="Paul Nyang'wara" style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top" }} />
           <span style={{ fontFamily: "'Playfair Display', serif", color: "white", fontSize: 20, fontWeight: 700 }}>
             Paul <span style={{ color: GOLD }}>Nyang'wara</span>
           </span>
@@ -152,8 +152,9 @@ export default function Navbar() {
             style={{ position: "absolute", top: 24, right: 32, background: "none", border: "none", color: GOLD, fontSize: 32, cursor: "pointer" }}
           >✕</button>
 
-          <div style={{ fontFamily: "'Playfair Display', serif", color: GOLD, fontSize: 28, marginBottom: 8 }}>
-            ⚡ Paul Nyang'wara
+          <div style={{ fontFamily: "'Playfair Display', serif", color: GOLD, fontSize: 28, marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
+            <img src="/paul-headshot.jpg" alt="Paul Nyang'wara" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", objectPosition: "top" }} />
+            Paul Nyang'wara
           </div>
 
           {NAV_ITEMS.map(({ label, path }) => (
