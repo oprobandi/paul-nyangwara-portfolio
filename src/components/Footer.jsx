@@ -1,11 +1,8 @@
 import { Link } from "react-router-dom";
 
-const NAVY       = "#0A1F44";
-const GOLD       = "#D4AF37";
-const GOLD_LIGHT = "#F0D060";
-const DARK_BG    = "#06132A";
+const GOLD    = "#D4AF37";
+const DARK_BG = "#06132A";
 
-/* Matches navbar exactly — Home now first */
 const NAV_ITEMS = [
   { label: "Home",     path: "/"         },
   { label: "About",    path: "/about"    },
@@ -16,7 +13,11 @@ const NAV_ITEMS = [
   { label: "Contact",  path: "/#contact" },
 ];
 
-// ─── SVG Icons ────────────────────────────────────────────────────────────────
+const LEGAL_ITEMS = [
+  { label: "Privacy Policy",   path: "/privacy" },
+  { label: "Terms of Service", path: "/terms"   },
+];
+
 const IconGitHub = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
@@ -45,32 +46,26 @@ const SOCIALS = [
   { label: "Instagram", href: "https://instagram.com/oprobandi",    Icon: IconInstagram },
 ];
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const footerStyles = `
   .footer-ql {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     color: rgba(255,255,255,0.6);
     text-decoration: none;
-    font-size: 14px;
-    margin-bottom: 11px;
-    transition: color 0.25s;
+    font-size: 13px;
     font-family: 'DM Sans', sans-serif;
-  }
-  .footer-ql::before {
-    content: '';
-    display: inline-block;
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: ${GOLD};
-    opacity: 0.45;
-    flex-shrink: 0;
-    transition: opacity 0.25s;
+    font-weight: 500;
+    transition: color 0.25s;
+    white-space: nowrap;
   }
   .footer-ql:hover { color: ${GOLD}; }
-  .footer-ql:hover::before { opacity: 1; }
-
+  .footer-ql-sep { color: rgba(212,175,55,0.25); font-size: 13px; user-select: none; }
+  .footer-legal-link {
+    color: rgba(255,255,255,0.35);
+    text-decoration: none;
+    font-size: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: color 0.25s;
+  }
+  .footer-legal-link:hover { color: ${GOLD}; }
   .footer-soc {
     display: flex; align-items: center; justify-content: center;
     width: 38px; height: 38px; border-radius: 8px;
@@ -81,145 +76,87 @@ const footerStyles = `
     transition: all 0.25s;
   }
   .footer-soc:hover {
-    border-color: ${GOLD};
-    color: ${GOLD};
-    background: rgba(212,175,55,0.08);
-    transform: translateY(-2px);
+    border-color: ${GOLD}; color: ${GOLD};
+    background: rgba(212,175,55,0.08); transform: translateY(-2px);
   }
-
   @media (max-width: 768px) {
-    .footer-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
-    .footer-bottom { text-align: center; }
+    .footer-nav-row { flex-wrap: wrap !important; row-gap: 10px !important; justify-content: center !important; }
+    .footer-nav-row .footer-ql-sep { display: none; }
+    .footer-bottom-row { flex-direction: column !important; align-items: center !important; gap: 10px !important; text-align: center; }
   }
 `;
 
 export default function Footer() {
   const year = new Date().getFullYear();
-
   return (
     <>
       <style>{footerStyles}</style>
-
-      <footer style={{
-        background: DARK_BG,
-        borderTop: "1px solid rgba(212,175,55,0.25)",
-        padding: "64px 40px 32px",
-      }}>
+      <footer style={{ background: DARK_BG, borderTop: "1px solid rgba(212,175,55,0.25)", padding: "64px 40px 32px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
 
-          {/* ── Top grid: Brand (left, wider) + Quick Links (right) ── */}
-          <div
-            className="footer-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.55fr 1fr",
-              gap: 56,
-              marginBottom: 48,
-              alignItems: "start",
-            }}
-          >
-
-            {/* ── Column 1: Brand ── */}
-            <div>
-              {/* Logo + company name on same line */}
-              <Link to="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
-                <img
-                  src="/neurospark-logo.jpg"
-                  alt="NeuroSpark Logo"
-                  style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
-                />
-                <div>
-                  <div style={{
-                    fontFamily: "'Playfair Display', serif",
-                    color: "white",
-                    fontSize: 22,
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                  }}>
-                    NeuroSpark <span style={{ color: GOLD }}>Corporation</span>
-                  </div>
-                  <div style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    color: "rgba(255,255,255,0.4)",
-                    fontSize: 11,
-                    fontWeight: 500,
-                    letterSpacing: 0.8,
-                    marginTop: 3,
-                  }}>
-                    Founded by Paul Nyang'wara
-                  </div>
+          {/* Brand */}
+          <div style={{ marginBottom: 40 }}>
+            <Link to="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+              <img src="/neurospark-logo.jpg" alt="NeuroSpark Logo" style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+              <div>
+                <div style={{ fontFamily: "'Playfair Display', serif", color: "white", fontSize: 22, fontWeight: 700, lineHeight: 1.2 }}>
+                  NeuroSpark <span style={{ color: GOLD }}>Corporation</span>
                 </div>
-              </Link>
+                <div style={{ fontFamily: "'Space Grotesk', sans-serif", color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 500, letterSpacing: 0.8, marginTop: 3 }}>
+                  Founded by Paul Nyang'wara
+                </div>
+              </div>
+            </Link>
+            <p style={{ color: "rgba(255,255,255,0.52)", fontSize: 14, lineHeight: 1.75, maxWidth: 340, margin: "0 0 22px" }}>
+              Sparking Africa's AI Revolution,<br />One Business at a Time.
+            </p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {SOCIALS.map(({ label, href, Icon }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="footer-soc" aria-label={label} title={label}>
+                  <Icon />
+                </a>
+              ))}
+            </div>
+          </div>
 
-              {/* Tagline */}
-              <p style={{
-                color: "rgba(255,255,255,0.52)",
-                fontSize: 14,
-                lineHeight: 1.75,
-                maxWidth: 310,
-                margin: "0 0 22px",
-              }}>
-                Sparking Africa's AI Revolution,<br />One Business at a Time.
+          {/* Quick Links label */}
+          <div style={{ color: GOLD, fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 14 }}>
+            Quick Links
+          </div>
+
+          {/* Horizontal nav row */}
+          <div className="footer-nav-row" style={{ display: "flex", alignItems: "center", flexWrap: "nowrap", marginBottom: 40 }}>
+            {NAV_ITEMS.map(({ label, path }, i) => (
+              <span key={path} style={{ display: "flex", alignItems: "center" }}>
+                {path.startsWith("/#") ? (
+                  <a href={path} className="footer-ql">{label}</a>
+                ) : (
+                  <Link to={path} className="footer-ql">{label}</Link>
+                )}
+                {i < NAV_ITEMS.length - 1 && (
+                  <span className="footer-ql-sep" style={{ margin: "0 12px" }}>|</span>
+                )}
+              </span>
+            ))}
+          </div>
+
+          {/* Bottom bar */}
+          <div style={{ borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 24 }}>
+            <div className="footer-bottom-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+              <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 13, fontFamily: "'Space Grotesk', sans-serif", margin: 0 }}>
+                © {year} NeuroSpark Corporation. All Rights Reserved.
               </p>
-
-              {/* 4 Social icon buttons */}
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                {SOCIALS.map(({ label, href, Icon }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="footer-soc"
-                    aria-label={label}
-                    title={label}
-                  >
-                    <Icon />
-                  </a>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {LEGAL_ITEMS.map(({ label, path }, i) => (
+                  <span key={path} style={{ display: "flex", alignItems: "center" }}>
+                    <Link to={path} className="footer-legal-link">{label}</Link>
+                    {i < LEGAL_ITEMS.length - 1 && (
+                      <span style={{ color: "rgba(212,175,55,0.2)", margin: "0 8px", fontSize: 12 }}>·</span>
+                    )}
+                  </span>
                 ))}
               </div>
             </div>
-
-            {/* ── Column 2: Quick Links ── */}
-            <div>
-              <div style={{
-                color: GOLD,
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: 2.5,
-                textTransform: "uppercase",
-                marginBottom: 20,
-              }}>
-                Quick Links
-              </div>
-
-              {NAV_ITEMS.map(({ label, path }) =>
-                path.startsWith("/#") ? (
-                  <a key={path} href={path} className="footer-ql">{label}</a>
-                ) : (
-                  <Link key={path} to={path} className="footer-ql">{label}</Link>
-                )
-              )}
-            </div>
-
-          </div>
-
-          {/* ── Bottom bar: copyright only ── */}
-          <div
-            className="footer-bottom"
-            style={{
-              borderTop: "1px solid rgba(212,175,55,0.15)",
-              paddingTop: 24,
-            }}
-          >
-            <p style={{
-              color: "rgba(255,255,255,0.32)",
-              fontSize: 13,
-              fontFamily: "'Space Grotesk', sans-serif",
-            }}>
-              © {year} NeuroSpark Corporation. All Rights Reserved.
-            </p>
           </div>
 
         </div>

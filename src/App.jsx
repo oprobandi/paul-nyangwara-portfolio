@@ -24,6 +24,8 @@ import ServicesPage           from "./pages/ServicesPage";
 import ProjectsPage           from "./pages/ProjectsPage";
 import BlogPage               from "./pages/BlogPage";
 import SkillsTestimonialsPage from "./pages/SkillsTestimonialsPage";
+import PrivacyPage            from "./pages/PrivacyPage";
+import TermsPage              from "./pages/TermsPage";
 
 /* ── Scroll to top on every route change ─────────────────────────── */
 function ScrollReset() {
@@ -126,6 +128,8 @@ export default function App() {
           <Route path="/projects" element={<ProjectsPage />}            />
           <Route path="/blog"     element={<BlogPage />}                />
           <Route path="/skills"   element={<SkillsTestimonialsPage />}  />
+          <Route path="/privacy" element={<PrivacyPage />}              />
+          <Route path="/terms"   element={<TermsPage />}                />
         </Route>
 
         {/* 404 — outside Layout so it gets its own full-screen treatment */}
