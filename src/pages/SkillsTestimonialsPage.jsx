@@ -76,7 +76,6 @@ const styles = `
   @media (min-width: 769px) { .mobile-menu-btn { display: none !important; } }
 `;
 
-const NAV_LINKS = ["About", "Services", "Projects", "Skills", "Testimonials", "Contact"];
 
 const SKILLS_TICKER = [
   { name: "Python", emoji: "🐍" }, { name: "JavaScript", emoji: "🟨" }, { name: "React", emoji: "⚛️" },
@@ -144,7 +143,7 @@ const TESTIMONIALS = [
     name: "Amara Osei",
     role: "Operations Manager",
     company: "QuickMart Kenya",
-    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1507152832244-10d45c7eda57?w=120&q=80",
     quote: "NeuroSpark built us an AI agent that handles 80% of our customer queries automatically. Our team now focuses on growth, not repetitive tasks. Paul and his team are simply world-class.",
     service: "AI Automation",
     rating: 5,
@@ -154,7 +153,7 @@ const TESTIMONIALS = [
     name: "Fatima Hassan",
     role: "Marketing Director",
     company: "Nairobi Digital Co.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=120&q=80",
     quote: "Our website traffic tripled within 4 months of engaging NeuroSpark for SEO. The results speak for themselves. Highly professional, data-driven, and always delivering on promises.",
     service: "SEO",
     rating: 5,
@@ -164,7 +163,7 @@ const TESTIMONIALS = [
     name: "David Kiprono",
     role: "Managing Partner",
     company: "AfriFinance Ltd.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?w=120&q=80",
     quote: "The website NeuroSpark designed for us is stunning and converts incredibly well. Paul understood our vision from day one and brought it to life beyond expectations. A true partner.",
     service: "Web Development",
     rating: 5,
@@ -174,7 +173,7 @@ const TESTIMONIALS = [
     name: "Grace Wambui",
     role: "CEO",
     company: "NairobiShops.co.ke",
-    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=120&q=80",
     quote: "We finally understand what's happening with our SEO in real time. Paul built a custom dashboard that's saved us 8 hours of weekly reporting. The ROI is extraordinary.",
     service: "SEO + Web Dev",
     rating: 5,
@@ -184,7 +183,7 @@ const TESTIMONIALS = [
     name: "Peter Kamau",
     role: "Sales Director",
     company: "Apex Insurance",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=120&q=80",
     quote: "AutoLead books more qualified meetings in a week than my team used to in a month. It's like having a full-time SDR that never sleeps. Paul truly delivered on his promise.",
     service: "AI Automation",
     rating: 5,
@@ -194,7 +193,7 @@ const TESTIMONIALS = [
     name: "Njeri Kamau",
     role: "Guest Experience Manager",
     company: "Serena Hotels",
-    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1596728325488-58c87691e9af?w=120&q=80",
     quote: "SmartDesk handles our late-night guest queries better than some of our junior staff. Paul truly understood the hospitality context and built something that genuinely delights guests.",
     service: "AI Automation",
     rating: 5,
@@ -204,7 +203,7 @@ const TESTIMONIALS = [
     name: "Daniel Mwangi",
     role: "Founder",
     company: "AfriCart Ltd.",
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=120&q=80",
     quote: "Paul built exactly what Kenya's e-commerce market needed. The M-Pesa integration is seamless, our Lighthouse score is 94, and we did KES 2M GMV in our first month. Unbelievable.",
     service: "Web Development",
     rating: 5,
@@ -214,7 +213,7 @@ const TESTIMONIALS = [
     name: "Sarah Odhiambo",
     role: "Managing Partner",
     company: "Sterling Capital",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=120&q=80",
     quote: "Within a month of launching the new site, we had more qualified enquiries than the entire previous quarter. The ROI has been extraordinary. Paul is a rare talent in this market.",
     service: "Web Development",
     rating: 5,
@@ -264,9 +263,6 @@ function SkillBar({ name, pct, tag }) {
 }
 
 export default function SkillsTestimonialsPage() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [waHover, setWaHover] = useState(false);
   const [activeTab, setActiveTab] = useState("skills"); // "skills" | "testimonials"
   const [testimonialFilter, setTestimonialFilter] = useState("All");
   const [activeTestimonialIdx, setActiveTestimonialIdx] = useState(0);
@@ -275,12 +271,6 @@ export default function SkillsTestimonialsPage() {
   const filteredTestimonials = testimonialFilter === "All"
     ? TESTIMONIALS
     : TESTIMONIALS.filter(t => t.service === testimonialFilter);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -297,27 +287,7 @@ export default function SkillsTestimonialsPage() {
     <>
       <style>{styles}</style>
 
-      {/* ─── NAVBAR ─── */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "0 40px", height: 72, display: "flex", alignItems: "center", justifyContent: "space-between", background: scrolled ? "rgba(10,31,68,0.97)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(212,175,55,0.2)" : "none", transition: "all 0.4s" }}>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <span style={{ fontSize: 24 }}>⚡</span>
-          <span style={{ fontFamily: "'Playfair Display', serif", color: "white", fontSize: 20, fontWeight: 700 }}>Paul <span style={{ color: GOLD }}>Nyang'wara</span></span>
-        </a>
-        <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 36 }}>
-          {NAV_LINKS.map(l => <a key={l} href={`/#${l.toLowerCase()}`} className={`nav-link${(l === "Skills" || l === "Testimonials") ? " active" : ""}`}>{l}</a>)}
-          <a href="/#contact"><button className="btn-gold" style={{ padding: "10px 24px", fontSize: 13 }}>Let's Talk</button></a>
-        </div>
-        <button className="mobile-menu-btn" onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", color: GOLD, fontSize: 26, display: "none" }}>☰</button>
-      </nav>
 
-      {mobileOpen && (
-        <div className="mobile-menu">
-          <button onClick={() => setMobileOpen(false)} style={{ position: "absolute", top: 24, right: 32, background: "none", border: "none", color: GOLD, fontSize: 32, cursor: "pointer" }}>✕</button>
-          <div style={{ fontFamily: "'Playfair Display', serif", color: GOLD, fontSize: 28 }}>⚡ Paul Nyang'wara</div>
-          {NAV_LINKS.map(l => <a key={l} href={`/#${l.toLowerCase()}`} onClick={() => setMobileOpen(false)} style={{ color: "white", textDecoration: "none", fontFamily: "'Space Grotesk', sans-serif", fontSize: 22, fontWeight: 500 }}>{l}</a>)}
-          <a href="/#contact" onClick={() => setMobileOpen(false)}><button className="btn-gold">Let's Talk</button></a>
-        </div>
-      )}
 
       {/* ─── HERO ─── */}
       <section style={{ background: NAVY, paddingTop: 140, paddingBottom: 0, textAlign: "center", position: "relative", overflow: "hidden" }}>
@@ -618,27 +588,7 @@ export default function SkillsTestimonialsPage() {
         </AnimSection>
       </section>
 
-      {/* ─── FOOTER ─── */}
-      <footer style={{ background: "#06132A", borderTop: "1px solid rgba(212,175,55,0.25)", padding: "48px 40px 28px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
-          <div>
-            <div style={{ fontFamily: "'Playfair Display', serif", color: "white", fontSize: 22, fontWeight: 700, marginBottom: 4 }}>⚡ Paul <span style={{ color: GOLD }}>Nyang'wara</span></div>
-            <div style={{ color: GOLD, fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2 }}>NEUROSPARK CORPORATION</div>
-          </div>
-          <div style={{ display: "flex", gap: 28, flexWrap: "wrap" }}>
-            {NAV_LINKS.map(l => <a key={l} href={`/#${l.toLowerCase()}`} style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", fontSize: 13, transition: "color 0.3s" }} onMouseEnter={e => e.target.style.color = GOLD} onMouseLeave={e => e.target.style.color = "rgba(255,255,255,0.55)"}>{l}</a>)}
-          </div>
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>© 2025 NeuroSpark Corporation. All Rights Reserved.</p>
-        </div>
-      </footer>
 
-      {/* ─── WHATSAPP ─── */}
-      <div className="wa-widget">
-        {waHover && <div className="wa-tooltip">💬 Chat with Paul on WhatsApp</div>}
-        <a href="https://wa.me/254799644100" target="_blank" rel="noopener noreferrer" className="wa-btn" onMouseEnter={() => setWaHover(true)} onMouseLeave={() => setWaHover(false)}>
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-        </a>
-      </div>
     </>
   );
 }

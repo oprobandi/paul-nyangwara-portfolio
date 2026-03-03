@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 
-const NAVY  = "#0A1F44";
-const GOLD  = "#D4AF37";
+const NAVY       = "#0A1F44";
+const GOLD       = "#D4AF37";
 const GOLD_LIGHT = "#F0D060";
 
 const navStyles = `
@@ -31,9 +31,9 @@ const navStyles = `
   .nav-link.active::after { width: 100%; }
 
   .btn-gold {
-    background: ${GOLD}; color: ${NAVY}; border: none; padding: 14px 32px;
+    background: ${GOLD}; color: ${NAVY}; border: none; padding: 10px 24px;
     border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-    font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
+    font-size: 13px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
     text-decoration: none; display: inline-block;
   }
   .btn-gold:hover { background: ${GOLD_LIGHT}; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
@@ -61,7 +61,9 @@ const navStyles = `
   }
 `;
 
+/* Home now first, then all other routes */
 const NAV_ITEMS = [
+  { label: "Home",     path: "/"         },
   { label: "About",    path: "/about"    },
   { label: "Services", path: "/services" },
   { label: "Projects", path: "/projects" },
@@ -70,8 +72,8 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled]     = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled,    setScrolled]    = useState(false);
+  const [mobileOpen,  setMobileOpen]  = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -107,29 +109,37 @@ export default function Navbar() {
         borderBottom: scrolled ? "1px solid rgba(212,175,55,0.2)" : "none",
         transition: "all 0.4s",
       }}>
+        {/* Logo */}
         <Link to="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <span style={{ fontSize: 24 }}>⚡</span>
+          <img
+            src="/paul-headshot.jpg"
+            alt="Paul Nyang'wara"
+            style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top" }}
+          />
           <span style={{ fontFamily: "'Playfair Display', serif", color: "white", fontSize: 20, fontWeight: 700 }}>
             Paul <span style={{ color: GOLD }}>Nyang'wara</span>
           </span>
         </Link>
 
-        <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 36 }}>
+        {/* Desktop Nav */}
+        <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 32 }}>
           {NAV_ITEMS.map(({ label, path }) => (
             <NavLink
               key={path}
               to={path}
+              end={path === "/"}
               className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
             >
               {label}
             </NavLink>
           ))}
           <a href="/#contact" onClick={goToContact} className="nav-link">Contact</a>
-          <a href="/#contact" onClick={goToContact}>
-            <button className="btn-gold" style={{ padding: "10px 24px", fontSize: 13 }}>Let's Talk</button>
+          <a href="/#contact" onClick={goToContact} style={{ textDecoration: "none" }}>
+            <button className="btn-gold">Let's Talk</button>
           </a>
         </div>
 
+        {/* Mobile hamburger */}
         <button
           className="mobile-menu-btn"
           onClick={() => setMobileOpen(true)}
@@ -137,6 +147,7 @@ export default function Navbar() {
         >☰</button>
       </nav>
 
+      {/* Mobile Menu */}
       {mobileOpen && (
         <div className="mobile-menu">
           <button
@@ -144,14 +155,16 @@ export default function Navbar() {
             style={{ position: "absolute", top: 24, right: 32, background: "none", border: "none", color: GOLD, fontSize: 32, cursor: "pointer" }}
           >✕</button>
 
-          <div style={{ fontFamily: "'Playfair Display', serif", color: GOLD, fontSize: 28, marginBottom: 8 }}>
-            ⚡ Paul Nyang'wara
+          <div style={{ fontFamily: "'Playfair Display', serif", color: GOLD, fontSize: 28, marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
+            <img src="/paul-headshot.jpg" alt="Paul Nyang'wara" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", objectPosition: "top" }} />
+            Paul Nyang'wara
           </div>
 
           {NAV_ITEMS.map(({ label, path }) => (
             <NavLink
               key={path}
               to={path}
+              end={path === "/"}
               className={({ isActive }) => `mobile-menu-nav-link${isActive ? " active" : ""}`}
               onClick={() => setMobileOpen(false)}
             >
@@ -167,8 +180,8 @@ export default function Navbar() {
             Contact
           </a>
 
-          <a href="/#contact" onClick={(e) => { setMobileOpen(false); goToContact(e); }}>
-            <button className="btn-gold">Let's Talk</button>
+          <a href="/#contact" onClick={(e) => { setMobileOpen(false); goToContact(e); }} style={{ textDecoration: "none" }}>
+            <button className="btn-gold" style={{ padding: "12px 32px", fontSize: 15 }}>Let's Talk</button>
           </a>
         </div>
       )}
