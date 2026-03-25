@@ -142,7 +142,7 @@ function SkillBar({ name, pct }) {
 }
 
 export default function AboutPage() {
-  useDocumentTitle('About Paul Nyang'wara — Nairobi AI Developer');
+  useDocumentTitle("About Paul Nyang'wara — Nairobi AI Developer");
   const [activeSkillCat, setActiveSkillCat] = useState(0);
 
   return (
