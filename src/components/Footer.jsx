@@ -3,16 +3,6 @@ import { Link } from "react-router-dom";
 const GOLD    = "#D4AF37";
 const DARK_BG = "#06132A";
 
-const NAV_ITEMS = [
-  { label: "Home",     path: "/"         },
-  { label: "About",    path: "/about"    },
-  { label: "Services", path: "/services" },
-  { label: "Projects", path: "/projects" },
-  { label: "Blog",     path: "/blog"     },
-  { label: "Skills",   path: "/skills"   },
-  { label: "Contact",  path: "/#contact" },
-];
-
 const LEGAL_ITEMS = [
   { label: "Privacy Policy",   path: "/privacy" },
   { label: "Terms of Service", path: "/terms"   },
@@ -47,17 +37,6 @@ const SOCIALS = [
 ];
 
 const footerStyles = `
-  .footer-ql {
-    color: rgba(255,255,255,0.6);
-    text-decoration: none;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    transition: color 0.25s;
-    white-space: nowrap;
-  }
-  .footer-ql:hover { color: ${GOLD}; }
-  .footer-ql-sep { color: rgba(212,175,55,0.25); font-size: 13px; user-select: none; }
   .footer-legal-link {
     color: rgba(255,255,255,0.35);
     text-decoration: none;
@@ -80,8 +59,6 @@ const footerStyles = `
     background: rgba(212,175,55,0.08); transform: translateY(-2px);
   }
   @media (max-width: 768px) {
-    .footer-nav-row { flex-wrap: wrap !important; row-gap: 10px !important; justify-content: center !important; }
-    .footer-nav-row .footer-ql-sep { display: none; }
     .footer-bottom-row { flex-direction: column !important; align-items: center !important; gap: 10px !important; text-align: center; }
   }
 `;
@@ -95,7 +72,7 @@ export default function Footer() {
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
 
           {/* Brand */}
-          <div style={{ marginBottom: 40 }}>
+          <div style={{ marginBottom: 48 }}>
             <Link to="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
               <img src="/neurospark-logo.jpg" alt="NeuroSpark Logo" style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
               <div>
@@ -117,27 +94,6 @@ export default function Footer() {
                 </a>
               ))}
             </div>
-          </div>
-
-          {/* Quick Links label */}
-          <div style={{ color: GOLD, fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 14 }}>
-            Quick Links
-          </div>
-
-          {/* Horizontal nav row */}
-          <div className="footer-nav-row" style={{ display: "flex", alignItems: "center", flexWrap: "nowrap", marginBottom: 40 }}>
-            {NAV_ITEMS.map(({ label, path }, i) => (
-              <span key={path} style={{ display: "flex", alignItems: "center" }}>
-                {path.startsWith("/#") ? (
-                  <a href={path} className="footer-ql">{label}</a>
-                ) : (
-                  <Link to={path} className="footer-ql">{label}</Link>
-                )}
-                {i < NAV_ITEMS.length - 1 && (
-                  <span className="footer-ql-sep" style={{ margin: "0 12px" }}>|</span>
-                )}
-              </span>
-            ))}
           </div>
 
           {/* Bottom bar */}
