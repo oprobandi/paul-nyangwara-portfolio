@@ -2,10 +2,93 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Paul Nyang'wara — Full-Stack Developer & AI Solutions Architect based in Nairobi, Kenya." />
-    <title>Paul Nyang'wara | Developer & AI Architect</title>
+
+    <!-- ── Favicon ──────────────────────────────────────────────────── -->
+    <!-- Generate full set at realfavicongenerator.net from paul-headshot.jpg -->
+    <link rel="icon"             type="image/svg+xml"  href="/favicon.svg" />
+    <link rel="icon"             type="image/jpeg"     href="/favicon.jpg" />
+    <link rel="apple-touch-icon"                       href="/favicon.jpg" />
+
+    <!-- ── Primary meta ─────────────────────────────────────────────── -->
+    <title>Paul Nyang'wara | AI Developer &amp; NeuroSpark CEO, Nairobi</title>
+    <meta name="description"
+          content="Founder &amp; CEO of NeuroSpark Corporation. I build AI agents, automate workflows, and grow search rankings for businesses across East Africa." />
+    <meta name="author"    content="Paul Nyang'wara" />
+    <meta name="robots"    content="index, follow" />
+    <link rel="canonical"  href="https://paul-nyangwara-portfolio.vercel.app/" />
+    <!-- TODO: Replace canonical base URL once dedicated domain is purchased -->
+
+    <!-- ── Open Graph ────────────────────────────────────────────────── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="Paul Nyang'wara Portfolio" />
+    <meta property="og:locale"      content="en_KE" />
+    <meta property="og:url"         content="https://paul-nyangwara-portfolio.vercel.app/" />
+    <meta property="og:title"       content="Paul Nyang'wara — AI Developer &amp; NeuroSpark CEO, Nairobi" />
+    <meta property="og:description" content="Founder &amp; CEO of NeuroSpark Corporation. Building AI agents, automating workflows, and growing search rankings for businesses across East Africa." />
+    <meta property="og:image"       content="https://paul-nyangwara-portfolio.vercel.app/paul-headshot.jpg" />
+    <meta property="og:image:width"  content="800" />
+    <meta property="og:image:height" content="800" />
+    <meta property="og:image:alt"    content="Paul Nyang'wara — Founder &amp; CEO, NeuroSpark Corporation" />
+
+    <!-- ── Twitter / X Card ─────────────────────────────────────────── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:site"        content="@o_probandi" />
+    <meta name="twitter:creator"     content="@o_probandi" />
+    <meta name="twitter:title"       content="Paul Nyang'wara — AI Developer &amp; CEO, Nairobi" />
+    <meta name="twitter:description" content="Building AI agents for East African businesses. Founder of NeuroSpark Corporation." />
+    <meta name="twitter:image"       content="https://paul-nyangwara-portfolio.vercel.app/paul-headshot.jpg" />
+
+    <!-- ── JSON-LD: Person + WebSite schema ─────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://paul-nyangwara-portfolio.vercel.app/#person",
+          "name": "Paul Nyang'wara",
+          "jobTitle": "Founder & CEO",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "NeuroSpark Corporation",
+            "url": "https://neurosparkcorporation.ai"
+          },
+          "url": "https://paul-nyangwara-portfolio.vercel.app",
+          "image": "https://paul-nyangwara-portfolio.vercel.app/paul-headshot.jpg",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Nairobi",
+            "addressCountry": "KE"
+          },
+          "sameAs": [
+            "https://github.com/oprobandi",
+            "https://linkedin.com/in/oprobandi",
+            "https://x.com/o_probandi",
+            "https://instagram.com/oprobandi",
+            "https://facebook.com/oprobandi",
+            "https://neurosparkcorporation.ai"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://paul-nyangwara-portfolio.vercel.app/#website",
+          "url": "https://paul-nyangwara-portfolio.vercel.app",
+          "name": "Paul Nyang'wara Portfolio",
+          "description": "Personal portfolio of Paul Nyang'wara — AI developer, NeuroSpark CEO, Nairobi Kenya.",
+          "publisher": { "@id": "https://paul-nyangwara-portfolio.vercel.app/#person" }
+        }
+      ]
+    }
+    </script>
+
+    <!-- ── Google Fonts (preconnect + single stylesheet — replaces @import in pages) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Grotesk:wght@400;600;700&display=swap"
+    />
   </head>
   <body>
     <div id="root"></div>

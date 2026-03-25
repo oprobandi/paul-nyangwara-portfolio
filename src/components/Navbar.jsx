@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 
 const NAVY       = "#0A1F44";
-const GOLD       = "#D4AF37";
-const GOLD_LIGHT = "#F0D060";
+const GOLD       = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 
 const navStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { font-family: 'DM Sans', sans-serif; overflow-x: hidden; }

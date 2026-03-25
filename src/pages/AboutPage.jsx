@@ -1,13 +1,13 @@
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useState, useEffect, useRef } from "react";
 
 const NAVY = "#0A1F44";
-const GOLD = "#D4AF37";
-const GOLD_LIGHT = "#F0D060";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 const OFF_WHITE = "#F9F8F4";
 const CHARCOAL = "#1A1A2E";
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -94,6 +94,7 @@ const SKILLS_DEEP = [
   { cat: "Web Development", items: [{ name: "React / Next.js 14", pct: 92 }, { name: "Node.js / Express", pct: 89 }, { name: "WordPress / Headless CMS", pct: 85 }, { name: "UI/UX Design (Figma)", pct: 83 }] },
   { cat: "SEO & Growth", items: [{ name: "Technical SEO", pct: 90 }, { name: "Content Strategy", pct: 87 }, { name: "Ahrefs / SEMrush", pct: 88 }, { name: "Google Analytics 4", pct: 92 }] },
   { cat: "Infrastructure & Tools", items: [{ name: "Supabase / PostgreSQL", pct: 86 }, { name: "AWS / Vercel", pct: 82 }, { name: "Make / Zapier / N8N", pct: 94 }, { name: "Docker / Linux", pct: 80 }] },
+  { cat: "Systems Design", items: [{ name: "Multi-Agent System Design", pct: 91 }, { name: "Regulatory-Aware AI Systems", pct: 88 }, { name: "Audit-Grade System Design", pct: 87 }, { name: "Event-Driven Architecture", pct: 84 }] },
 ];
 
 const ACHIEVEMENTS = [
@@ -141,6 +142,7 @@ function SkillBar({ name, pct }) {
 }
 
 export default function AboutPage() {
+  useDocumentTitle('About Paul Nyang'wara — Nairobi AI Developer');
   const [activeSkillCat, setActiveSkillCat] = useState(0);
 
   return (

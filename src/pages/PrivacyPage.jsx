@@ -1,7 +1,9 @@
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 const NAVY = "#0A1F44";
-const GOLD = "#D4AF37";
+const GOLD = "#C9A84C";
 
 export default function PrivacyPage() {
+  useDocumentTitle('Privacy Policy');
   return (
     <div style={{ background: "#f9f7f2", minHeight: "100vh", padding: "80px 24px" }}>
       <div style={{ maxWidth: 760, margin: "0 auto" }}>

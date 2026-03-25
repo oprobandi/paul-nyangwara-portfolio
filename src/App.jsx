@@ -38,8 +38,8 @@ function ScrollReset() {
 
 /* ── 404 Not Found Page ──────────────────────────────────────────── */
 const NAVY = "#0A1F44";
-const GOLD = "#D4AF37";
-const GOLD_LIGHT = "#F0D060";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 
 const nfStyles = `
   @keyframes float404 { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-20px) rotate(2deg); } }

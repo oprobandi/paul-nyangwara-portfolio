@@ -1,13 +1,13 @@
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useState, useEffect, useRef } from "react";
 
 const NAVY = "#0A1F44";
-const GOLD = "#D4AF37";
-const GOLD_LIGHT = "#F0D060";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 const OFF_WHITE = "#F9F8F4";
 const CHARCOAL = "#1A1A2E";
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -265,9 +265,100 @@ const PROJECTS = [
     testimonial: { quote: "SmartDesk handles our late-night guest queries better than some of our junior staff. Paul truly understood the hospitality context.", name: "Njeri Kamau", role: "Guest Experience Manager, Serena Hotels" },
     featured: false,
   },
+
+  /* ── NeuroSpark Platform Projects ─────────────────────────────── */
+  {
+    id: 7,
+    title: "HESABU Multi-Agent Compliance Platform",
+    category: "AI Platform",
+    client: "NeuroSpark Corporation",
+    industry: "FinTech / Compliance",
+    year: "2025–2026",
+    shortDesc: "Designed and built a three-agent compliance platform — PESA, MALIPO, KODI — orchestrated by HESABU, handling the full monthly Kenyan employer compliance cycle end-to-end.",
+    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+    tags: ["Multi-Agent AI", "PostgreSQL", "Supabase", "Daraja API", "KRA iTax", "Event-Driven Architecture"],
+    results: [
+      { val: "3", label: "Agents Orchestrated" },
+      { val: "0", label: "Unconfirmed KRA Submissions" },
+      { val: "SHA-256", label: "P10 Audit Chain" },
+      { val: "Multi-tenant", label: "Architecture" },
+    ],
+    challenge: "Kenyan employer compliance spans three disconnected systems: M-Pesa reconciliation (PESA), payroll with live NSSF/AHL/SHA court order monitoring (MALIPO), and P10 generation with KRA iTax filing (KODI). No existing tool orchestrated all three in a single auditable session.",
+    solution: "Designed HESABU — a session manager and orchestrator that coordinates PESA, MALIPO, and KODI through an event bus. Each agent is stateless; HESABU owns all persistent state. The platform monitors live court orders on NSSF/AHL/SHA at every session start and enforces a human gate before any KRA submission.",
+    outcome: "The platform handles the full monthly compliance cycle: M-Pesa reconciliation → payroll computation with live regulatory monitoring → P10 generation with PIN validation → iTax filing with immutable SHA-256 verified audit trail. Zero KRA submissions proceed without explicit employer confirmation.",
+    techStack: [
+      { name: "Multi-Agent Architecture", role: "HESABU orchestrator + 3 specialist agents" },
+      { name: "PostgreSQL + Supabase", role: "Append-only audit tables, row-level security" },
+      { name: "M-Pesa Daraja API", role: "Mobile money transaction fetch & reconciliation" },
+      { name: "KRA iTax Integration", role: "P10 filing with acknowledgement tracking" },
+      { name: "Event-Driven Bus", role: "Agent coordination without direct coupling" },
+    ],
+    testimonial: { quote: "HESABU is the first system I've seen that treats compliance as a workflow, not a checklist. The audit trail alone is worth it.", name: "Paul Nyang'wara", role: "Founder & CEO, NeuroSpark Corporation" },
+    featured: true,
+    link: "https://neurosparkcorporation.ai/platforms/hesabu",
+  },
+  {
+    id: 8,
+    title: "EACTIC — EAC Trade Intelligence Core",
+    category: "AI Platform",
+    client: "NeuroSpark Corporation",
+    industry: "Trade Intelligence",
+    year: "2025",
+    shortDesc: "Built the shared intelligence backend serving three specialist trade agents: BIASHARA, Bidhaa, and ITCCA — providing real-time tariff rates, rules-of-origin verification, and NTB registry queries across EAC, COMESA, AfCFTA, EU-EPA, and AGOA frameworks.",
+    img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80",
+    tags: ["Multi-Agent AI", "EAC Tariff APIs", "Rules-of-Origin Engine", "NTB Registry", "AGOA/EUDR Monitoring"],
+    results: [
+      { val: "5+", label: "Trade Frameworks" },
+      { val: "Live", label: "Tariff Verification" },
+      { val: "54", label: "AfCFTA Countries" },
+      { val: "Real-time", label: "NTB Registry" },
+    ],
+    challenge: "East African trade compliance spans EAC, COMESA, AfCFTA, EU-EPA, and AGOA simultaneously. These frameworks interact — a product might qualify for 0% under COMESA but face 25% CET if origin documentation is incomplete. No single tool verified all frameworks per query.",
+    solution: "Built EACTIC as a shared API backend serving three specialist agents. Per request: confirms HS classification, retrieves applicable frameworks for the origin/destination pair, verifies rules-of-origin qualification, and checks active NTBs at specific border posts. No static rate tables — all data verified at query time from EAC Secretariat, KRA iCMS, URA, TRA, and RRA.",
+    outcome: "Live tariff rates from five East African revenue authorities verified per query. Rules-of-origin engine covers EAC, COMESA, AfCFTA, and EPA simultaneously. NTB registry with field-report confidence scoring at specific border posts. AGOA and EUDR regulatory alerts injected into agent context automatically.",
+    techStack: [
+      { name: "Multi-Agent Architecture", role: "EACTIC serves BIASHARA, Bidhaa, ITCCA agents" },
+      { name: "EAC Secretariat API", role: "Common External Tariff schedule" },
+      { name: "Rules-of-Origin Engine", role: "Transformation rules across 5 frameworks" },
+      { name: "NTB Registry", role: "Non-tariff barrier data with border post scoring" },
+      { name: "AGOA / EUDR Monitor", role: "Regulatory alert injection at session start" },
+    ],
+    testimonial: { quote: "EACTIC answers the question every East African importer asks: 'What rate do I actually pay?' Not the theoretical rate — the actual, verifiable, documentation-complete rate.", name: "Paul Nyang'wara", role: "Founder & CEO, NeuroSpark Corporation" },
+    featured: false,
+    link: "https://neurosparkcorporation.ai/agents/biashara",
+  },
+  {
+    id: 9,
+    title: "HESABU PostgreSQL Schema — Multi-Tenant Compliance Data Store",
+    category: "AI Platform",
+    client: "NeuroSpark Corporation",
+    industry: "Database Architecture",
+    year: "2025",
+    shortDesc: "Designed the full PostgreSQL schema for the HESABU platform: 10 tables with entity-level row-level security, append-only audit tables, and SHA-256 verified file chains linking every payroll run to its KRA acknowledgement.",
+    img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
+    tags: ["PostgreSQL", "Supabase", "Row-Level Security", "UUID", "Append-Only Audit Tables"],
+    results: [
+      { val: "10", label: "Schema Tables" },
+      { val: "RLS", label: "Entity Isolation" },
+      { val: "SHA-256", label: "File Verification" },
+    ],
+    challenge: "Compliance data requires immutability by design, not by convention. Audit tables must be append-only — no UPDATE or DELETE. Multi-tenant accountant access must guarantee zero cross-entity data leakage. Every payroll run must be traceable from initial computation to KRA acknowledgement, linkable 3+ years later.",
+    solution: "Designed 10 PostgreSQL tables with entity-level row-level security (RLS) via Supabase. Implemented append-only event_log_store and audit_log_store tables where UPDATE and DELETE are revoked at the database role level — not just by convention. UUID-keyed immutable event chains link payroll_run_id → P10 checksum → iTax acknowledgement number.",
+    outcome: "Append-only audit chain: every compliance event is immutable and linkable by UUID 3+ years post-filing. Entity isolation via PostgreSQL RLS — zero cross-tenant data leakage by architecture. Full PAYE audit chain: payroll_run_id → P10 SHA-256 checksum → iTax ack, queryable in a single join.",
+    techStack: [
+      { name: "PostgreSQL", role: "Primary data store with schema-level constraints" },
+      { name: "Supabase RLS", role: "Row-level security for multi-tenant isolation" },
+      { name: "UUID Keys", role: "Immutable event chain identifiers" },
+      { name: "Append-Only Tables", role: "No UPDATE/DELETE by database role policy" },
+      { name: "SHA-256 Checksums", role: "P10 file integrity verification" },
+    ],
+    testimonial: { quote: "The schema is the compliance guarantee. If the architecture allows deletion, the audit trail is a fiction. We built it so deletion is impossible.", name: "Paul Nyang'wara", role: "Founder & CEO, NeuroSpark Corporation" },
+    featured: false,
+    link: null,
+  },
 ];
 
-const CATEGORIES = ["All", "AI & Automation", "Web Development", "SEO"];
+const CATEGORIES = ["All", "AI & Automation", "Web Development", "SEO", "AI Platform"];
 
 function useInView(threshold = 0.1) {
   const ref = useRef(null);
@@ -393,6 +484,13 @@ function CaseStudyPanel({ project, onClose }) {
                 ))}
               </div>
 
+              {project.link && (
+                <a href={project.link} target="_blank" rel="noopener noreferrer" style={{ display: "block", marginBottom: 12 }}>
+                  <button className="btn-outline-gold" style={{ width: "100%", padding: "14px", fontSize: 14 }}>
+                    View Live on NeuroSpark →
+                  </button>
+                </a>
+              )}
               <a href="/#contact">
                 <button className="btn-gold" style={{ width: "100%", padding: "16px", fontSize: 15 }}>
                   Start a Similar Project →
@@ -407,6 +505,7 @@ function CaseStudyPanel({ project, onClose }) {
 }
 
 export default function ProjectsPage() {
+  useDocumentTitle('Projects & Case Studies');
   const [filter, setFilter] = useState("All");
   const [selectedProject, setSelectedProject] = useState(null);
 

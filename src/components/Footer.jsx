@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const GOLD    = "#D4AF37";
+const GOLD    = "#C9A84C";
 const DARK_BG = "#06132A";
 
 const LEGAL_ITEMS = [

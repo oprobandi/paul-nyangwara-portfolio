@@ -1,8 +1,9 @@
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const NAVY       = "#0A1F44";
-const GOLD       = "#D4AF37";
-const GOLD_LIGHT = "#F0D060";
+const GOLD       = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 const OFF_WHITE  = "#F9F8F4";
 const CHARCOAL   = "#1A1A2E";
 
@@ -14,7 +15,7 @@ const SLIDES = [
     label: "FOUNDER · CEO · AI INNOVATOR",
     heading: "Paul Nyang'wara",
     accent: "Portfolio",
-    sub: "Founder & CEO of <b style='color:#D4AF37'>NeuroSpark Corporation</b> — Kenya's premier AI & automation studio. I build AI agents, automate workflows, craft high-converting websites, and drive search rankings for businesses across Africa.",
+    sub: "Founder & CEO of <b style='color:#C9A84C'>NeuroSpark Corporation</b> — Kenya's premier AI & automation studio. I build AI agents, automate workflows, craft high-converting websites, and drive search rankings for businesses across Africa.",
     ctas: [
       { label: "Explore Our Work", href: "#projects", variant: "gold"    },
       { label: "Get In Touch",     href: "#contact",  variant: "outline" },
@@ -74,6 +75,7 @@ const SKILLS = [
   { name: "Google Analytics", emoji: "📊" }, { name: "Ahrefs",         emoji: "📡" }, { name: "SEMrush",    emoji: "🔍" },
   { name: "Make",             emoji: "⚙️" }, { name: "Zapier",         emoji: "⚡" }, { name: "Supabase",   emoji: "🗄️" },
   { name: "AWS",              emoji: "☁️" }, { name: "PostgreSQL",     emoji: "🐘" }, { name: "Vercel",     emoji: "🔺" },
+  { name: "Multi-Agent AI",   emoji: "🕸️" }, { name: "Event-Driven",     emoji: "🔄" }, { name: "LangGraph",  emoji: "🧠" },
 ];
 
 const TESTIMONIALS = [
@@ -83,10 +85,10 @@ const TESTIMONIALS = [
 ];
 
 const SKILLS_BARS = [
-  { label: "AI & Automation",     pct: 95 },
-  { label: "Web Development",     pct: 90 },
-  { label: "SEO Strategy",        pct: 88 },
-  { label: "Business Consulting", pct: 85 },
+  { label: "AI & Automation",        pct: 95 },
+  { label: "Multi-Agent System Design", pct: 91 },
+  { label: "Web Development",        pct: 90 },
+  { label: "SEO Strategy",           pct: 88 },
 ];
 
 // ─── SVG Icons ───────────────────────────────────────────────────────────────
@@ -149,7 +151,6 @@ const CONTACT_INFO = [
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -615,6 +616,7 @@ function HeroCarousel() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function PaulNyangwaraPortfolio() {
+  useDocumentTitle('AI Agents, Web Development & SEO — Nairobi, Kenya');
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [formState, setFormState]   = useState({ name: "", email: "", phone: "", service: "", message: "" });
   const [submitted, setSubmitted]   = useState(false);

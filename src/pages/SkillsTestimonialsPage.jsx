@@ -1,13 +1,13 @@
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useState, useEffect, useRef } from "react";
 
 const NAVY = "#0A1F44";
-const GOLD = "#D4AF37";
-const GOLD_LIGHT = "#F0D060";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 const OFF_WHITE = "#F9F8F4";
 const CHARCOAL = "#1A1A2E";
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -85,6 +85,7 @@ const SKILLS_TICKER = [
   { name: "Make", emoji: "⚙️" }, { name: "Zapier", emoji: "⚡" }, { name: "Supabase", emoji: "🗄️" },
   { name: "AWS", emoji: "☁️" }, { name: "PostgreSQL", emoji: "🐘" }, { name: "Vercel", emoji: "🔺" },
   { name: "Docker", emoji: "🐳" }, { name: "N8N", emoji: "🔄" },
+  { name: "Multi-Agent AI", emoji: "🕸️" }, { name: "LangGraph", emoji: "🧠" }, { name: "Event-Driven", emoji: "🔄" },
 ];
 
 const SKILL_CATEGORIES = [
@@ -134,6 +135,18 @@ const SKILL_CATEGORIES = [
       { name: "AWS (EC2, S3, Lambda)", pct: 82, tag: "Advanced" },
       { name: "Docker / Linux", pct: 80, tag: "Advanced" },
       { name: "Vercel / Netlify", pct: 91, tag: "Expert" },
+    ],
+  },
+  {
+    title: "Systems & Agent Design",
+    icon: "🕸️",
+    color: "#1a2a3e",
+    skills: [
+      { name: "Multi-Agent System Design", pct: 91, tag: "Expert" },
+      { name: "Regulatory-Aware AI Systems", pct: 88, tag: "Expert" },
+      { name: "Audit-Grade System Design", pct: 87, tag: "Expert" },
+      { name: "Event-Driven Architecture", pct: 84, tag: "Advanced" },
+      { name: "PostgreSQL Schema Design", pct: 87, tag: "Advanced" },
     ],
   },
 ];
@@ -263,6 +276,7 @@ function SkillBar({ name, pct, tag }) {
 }
 
 export default function SkillsTestimonialsPage() {
+  useDocumentTitle('Skills & Testimonials');
   const [activeTab, setActiveTab] = useState("skills"); // "skills" | "testimonials"
   const [testimonialFilter, setTestimonialFilter] = useState("All");
   const [activeTestimonialIdx, setActiveTestimonialIdx] = useState(0);

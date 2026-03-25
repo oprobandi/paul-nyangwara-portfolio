@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://paul-nyangwara-portfolio.vercel.app/sitemap.xml
+# TODO: Update URL once dedicated domain is purchased

@@ -1,13 +1,13 @@
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useState, useEffect, useRef } from "react";
 
 const NAVY = "#0A1F44";
-const GOLD = "#D4AF37";
-const GOLD_LIGHT = "#F0D060";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 const OFF_WHITE = "#F9F8F4";
 const CHARCOAL = "#1A1A2E";
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -261,6 +261,7 @@ function FAQItem({ q, a }) {
 }
 
 export default function ServicesPage() {
+  useDocumentTitle('Services — AI Automation, Web Dev & SEO');
   const [activeService, setActiveService] = useState(0);
 
   const svc = SERVICES_DATA[activeService];
