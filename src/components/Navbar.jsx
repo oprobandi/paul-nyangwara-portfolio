@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 
-const NAVY  = "#0A1F44";
-const GOLD  = "#D4AF37";
+const NAVY       = "#0A1F44";
+const GOLD       = "#D4AF37";
 const GOLD_LIGHT = "#F0D060";
 
 const navStyles = `
@@ -31,9 +31,9 @@ const navStyles = `
   .nav-link.active::after { width: 100%; }
 
   .btn-gold {
-    background: ${GOLD}; color: ${NAVY}; border: none; padding: 14px 32px;
+    background: ${GOLD}; color: ${NAVY}; border: none; padding: 10px 24px;
     border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-    font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
+    font-size: 13px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
     text-decoration: none; display: inline-block;
   }
   .btn-gold:hover { background: ${GOLD_LIGHT}; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
@@ -61,8 +61,9 @@ const navStyles = `
   }
 `;
 
-/* Nav items that map to actual routes */
+/* Home now first, then all other routes */
 const NAV_ITEMS = [
+  { label: "Home",     path: "/"         },
   { label: "About",    path: "/about"    },
   { label: "Services", path: "/services" },
   { label: "Projects", path: "/projects" },
@@ -71,8 +72,8 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled]     = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled,    setScrolled]    = useState(false);
+  const [mobileOpen,  setMobileOpen]  = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,12 +82,10 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* Close mobile menu on route change */
   useEffect(() => { setMobileOpen(false); }, []);
 
   const goToContact = (e) => {
     e.preventDefault();
-    /* If already on home, smooth-scroll; otherwise navigate then scroll */
     if (window.location.pathname === "/") {
       document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
     } else {
@@ -112,27 +111,31 @@ export default function Navbar() {
       }}>
         {/* Logo */}
         <Link to="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <img src="/paul-headshot.jpg" alt="Paul Nyang'wara" style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top" }} />
+          <img
+            src="/paul-headshot.jpg"
+            alt="Paul Nyang'wara"
+            style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top" }}
+          />
           <span style={{ fontFamily: "'Playfair Display', serif", color: "white", fontSize: 20, fontWeight: 700 }}>
             Paul <span style={{ color: GOLD }}>Nyang'wara</span>
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 36 }}>
+        <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: 32 }}>
           {NAV_ITEMS.map(({ label, path }) => (
             <NavLink
               key={path}
               to={path}
+              end={path === "/"}
               className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
             >
               {label}
             </NavLink>
           ))}
-          {/* Contact scrolls to /#contact section */}
           <a href="/#contact" onClick={goToContact} className="nav-link">Contact</a>
-          <a href="/#contact" onClick={goToContact}>
-            <button className="btn-gold" style={{ padding: "10px 24px", fontSize: 13 }}>Let's Talk</button>
+          <a href="/#contact" onClick={goToContact} style={{ textDecoration: "none" }}>
+            <button className="btn-gold">Let's Talk</button>
           </a>
         </div>
 
@@ -161,6 +164,7 @@ export default function Navbar() {
             <NavLink
               key={path}
               to={path}
+              end={path === "/"}
               className={({ isActive }) => `mobile-menu-nav-link${isActive ? " active" : ""}`}
               onClick={() => setMobileOpen(false)}
             >
@@ -176,8 +180,8 @@ export default function Navbar() {
             Contact
           </a>
 
-          <a href="/#contact" onClick={(e) => { setMobileOpen(false); goToContact(e); }}>
-            <button className="btn-gold">Let's Talk</button>
+          <a href="/#contact" onClick={(e) => { setMobileOpen(false); goToContact(e); }} style={{ textDecoration: "none" }}>
+            <button className="btn-gold" style={{ padding: "12px 32px", fontSize: 15 }}>Let's Talk</button>
           </a>
         </div>
       )}
