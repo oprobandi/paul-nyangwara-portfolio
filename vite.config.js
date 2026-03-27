@@ -1,14 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig(({ ssrBuild }) => ({
+// NOTE (v6.7.2): We do NOT rely on emptyOutDir:false here because Vite 5.1.x
+// does not reliably expose `ssrBuild` in the config function. The build script
+// in package.json instead saves dist/index.html before the SSR build and
+// restores it after, which is shell-level and version-independent.
+export default defineConfig({
   plugins: [react()],
-  build: {
-    // Prevent the SSR build from emptying dist/ and deleting the
-    // dist/index.html that the client build just produced.
-    // Bug: "vite build --ssr" defaults emptyOutDir:true, wiping dist/index.html.
-    emptyOutDir: !ssrBuild,
-  },
   ssr: {
     // Bundle dompurify into the server bundle rather than externalising it.
     // dompurify v3 degrades gracefully when no DOM is present (returns input
@@ -17,4 +15,4 @@ export default defineConfig(({ ssrBuild }) => ({
     // never actually called — but bundling avoids a Node require() error.
     noExternal: ['dompurify'],
   },
-}))
+})
