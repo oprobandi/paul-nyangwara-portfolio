@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-const NAVY = "#0A1F44";
-const GOLD = "#C9A84C";
+import { NAVY, GOLD } from '../constants'; // ADR-029
 
 const waStyles = `
   @keyframes pulse-gold { 0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.7); } 50% { box-shadow: 0 0 0 14px rgba(212,175,55,0); } }

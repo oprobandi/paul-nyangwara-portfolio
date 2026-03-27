@@ -42,6 +42,38 @@
     <priority>0.3</priority>
     <changefreq>yearly</changefreq>
   </url>
+  <!-- Blog posts (static fallbacks — v6.3) -->
+  <!-- TODO: Replace these slugs with live Hashnode post slugs once blog is active -->
+  <!-- TODO: Update base URL once dedicated domain is purchased -->
+  <url>
+    <loc>https://paul-nyangwara-portfolio.vercel.app/blog/ai-agents-african-smes-2025</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://paul-nyangwara-portfolio.vercel.app/blog/mpesa-daraja-integration-guide</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://paul-nyangwara-portfolio.vercel.app/blog/nairobi-seo-playbook-2025</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://paul-nyangwara-portfolio.vercel.app/blog/langchain-whatsapp-chatbot</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://paul-nyangwara-portfolio.vercel.app/blog/nextjs-kenya-3g-performance</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://paul-nyangwara-portfolio.vercel.app/blog/ai-automation-roi-sme</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
 </urlset>
 <!-- TODO: Update base URL once dedicated domain is purchased -->
-<!-- TODO: Add /blog/<slug> entries once Hashnode posts are live -->

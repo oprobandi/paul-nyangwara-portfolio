@@ -1,26 +1,23 @@
-import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useState, useEffect, useRef } from "react";
+import AnimSection from '../components/AnimSection';
+import { useInView } from '../hooks/useInView';
+import { useCountUp } from '../hooks/useCountUp';
 
-const NAVY = "#0A1F44";
-const GOLD = "#C9A84C";
-const GOLD_LIGHT = "#b8943e";
-const OFF_WHITE = "#F9F8F4";
-const CHARCOAL = "#1A1A2E";
+import { NAVY, GOLD, GOLD_LIGHT, OFF_WHITE, CHARCOAL } from '../constants'; // ADR-029
 
 const styles = `
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { font-family: 'DM Sans', sans-serif; background: ${OFF_WHITE}; color: ${CHARCOAL}; overflow-x: hidden; }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: ${NAVY}; }
-  ::-webkit-scrollbar-thumb { background: ${GOLD}; border-radius: 3px; }
-
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes pulse-gold { 0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.7); } 50% { box-shadow: 0 0 0 14px rgba(212,175,55,0); } }
+; }
+; border-radius: 3px; }
+to { opacity: 1; transform: translateY(0); } }
+to { opacity: 1; } }
+50% { box-shadow: 0 0 0 14px rgba(212,175,55,0); } }
   @keyframes wa-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+100% { transform: translateX(-50%); } }
   @keyframes tickerRev { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
   @keyframes starGlow { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
   @keyframes countUp { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
@@ -31,16 +28,14 @@ const styles = `
   .nav-link:hover { color: ${GOLD}; }
   .nav-link:hover::after, .nav-link.active::after { width: 100%; }
   .nav-link.active { color: ${GOLD}; }
-
-  .btn-gold { background: ${GOLD}; color: ${NAVY}; border: none; padding: 14px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
-  .btn-gold:hover { background: ${GOLD_LIGHT}; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
-  .btn-outline-gold { background: transparent; color: ${GOLD}; border: 2px solid ${GOLD}; padding: 13px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; }
-  .btn-outline-gold:hover { background: ${GOLD}; color: ${NAVY}; transform: translateY(-3px); }
-
-  .section-label { font-family: 'Space Grotesk', sans-serif; color: ${GOLD}; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+; color: ${NAVY}; border: none; padding: 14px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
+; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
+; border: 2px solid ${GOLD}; padding: 13px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; }
+; color: ${NAVY}; transform: translateY(-3px); }
+; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
   .section-heading { font-family: 'Playfair Display', serif; font-size: clamp(32px,4vw,52px); font-weight: 900; color: ${NAVY}; line-height: 1.15; }
   .section-heading-light { font-family: 'Playfair Display', serif; font-size: clamp(32px,4vw,52px); font-weight: 900; color: white; line-height: 1.15; }
-  .gold-divider { width: 60px; height: 3px; background: linear-gradient(90deg,${GOLD},${GOLD_LIGHT}); border-radius: 2px; margin: 16px 0 24px; }
+,${GOLD_LIGHT}); border-radius: 2px; margin: 16px 0 24px; }
 
   .skill-icon-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 20px; border-radius: 14px; transition: all 0.3s; cursor: default; min-width: 90px; }
   .skill-icon-wrap:hover { background: rgba(212,175,55,0.15); transform: translateY(-6px); }
@@ -236,47 +231,34 @@ const TESTIMONIALS = [
 
 const SERVICES_FILTER = ["All", "AI Automation", "Web Development", "SEO", "SEO + Web Dev"];
 
-function useInView(threshold = 0.1) {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, inView];
-}
 
-function AnimSection({ children, style = {}, delay = 0 }) {
-  const [ref, inView] = useInView();
-  return (
-    <div ref={ref} style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(36px)", transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`, ...style }}>
-      {children}
-    </div>
-  );
-}
 
 function SkillBar({ name, pct, tag }) {
-  const [ref, inView] = useInView();
+  const [countRef, display] = useCountUp(pct);
+  const [barRef, inView]    = useInView();
   const tagColor = tag === "Expert" ? GOLD : "#7cb8ff";
   return (
-    <div ref={ref} style={{ marginBottom: 18 }}>
+    <div ref={barRef} style={{ marginBottom: 18 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
         <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 600, color: NAVY }}>{name}</span>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <span style={{ background: `${tagColor}20`, color: tagColor, border: `1px solid ${tagColor}40`, padding: "1px 8px", borderRadius: 10, fontSize: 10, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700 }}>{tag}</span>
-          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 12, fontWeight: 700, color: GOLD }}>{pct}%</span>
+          <span ref={countRef} style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 12, fontWeight: 700, color: GOLD }}>{display}%</span>
         </div>
       </div>
       <div className="skill-bar-track">
-        <div className="skill-bar-fill" style={{ width: inView ? `${pct}%` : "0%" }} />
+        <div className="skill-bar-fill" style={{ width: inView ? `${pct}%` : "0%", transition: "width 1.4s cubic-bezier(0.25,0.8,0.25,1)" }} />
       </div>
     </div>
   );
 }
 
 export default function SkillsTestimonialsPage() {
-  useDocumentTitle('Skills & Testimonials');
+  useDocumentMeta({
+    title:       "Skills & Testimonials",
+    description: "Technical skills and client testimonials. Multi-agent AI, React, Python, LangChain, SEO, and more — with real results from real clients.",
+    canonical:   "/skills",
+  });
   const [activeTab, setActiveTab] = useState("skills"); // "skills" | "testimonials"
   const [testimonialFilter, setTestimonialFilter] = useState("All");
   const [activeTestimonialIdx, setActiveTestimonialIdx] = useState(0);

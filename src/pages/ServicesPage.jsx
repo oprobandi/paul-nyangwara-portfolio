@@ -1,27 +1,16 @@
-import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useState, useEffect, useRef } from "react";
 
-const NAVY = "#0A1F44";
-const GOLD = "#C9A84C";
-const GOLD_LIGHT = "#b8943e";
-const OFF_WHITE = "#F9F8F4";
-const CHARCOAL = "#1A1A2E";
+import { NAVY, GOLD, GOLD_LIGHT, OFF_WHITE, CHARCOAL } from '../constants'; // ADR-029
+import AnimSection from '../components/AnimSection';
 
 const styles = `
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body { font-family: 'DM Sans', sans-serif; background: ${OFF_WHITE}; color: ${CHARCOAL}; overflow-x: hidden; }
-
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: ${NAVY}; }
-  ::-webkit-scrollbar-thumb { background: ${GOLD}; border-radius: 3px; }
-
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  body { font-family: 'DM Sans', sans-serif; background: ${OFF_WHITE}; color: ${CHARCOAL}; overflow-x: hidden; }; }; border-radius: 3px; } to { opacity: 1; transform: translateY(0); } } to { opacity: 1; } }
   @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.7); } 50% { box-shadow: 0 0 0 14px rgba(212,175,55,0); } }
-  @keyframes wa-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-  @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+  @keyframes wa-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } } 100% { background-position: 400px 0; } }
   @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
   @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-10px); } }
 
@@ -34,33 +23,22 @@ const styles = `
   .nav-link:hover { color: ${GOLD}; }
   .nav-link:hover::after { width: 100%; }
   .nav-link.active { color: ${GOLD}; }
-  .nav-link.active::after { width: 100%; }
-
-  .btn-gold {
-    background: ${GOLD}; color: ${NAVY}; border: none; padding: 14px 32px;
+  .nav-link.active::after { width: 100%; }; color: ${NAVY}; border: none; padding: 14px 32px;
     border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
     font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
-  }
-  .btn-gold:hover { background: ${GOLD_LIGHT}; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
+  }; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
 
   .btn-outline {
     background: transparent; color: ${NAVY}; border: 2px solid ${NAVY}; padding: 13px 32px;
     border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
     font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
   }
-  .btn-outline:hover { background: ${NAVY}; color: white; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(10,31,68,0.2); }
-
-  .btn-outline-gold {
-    background: transparent; color: ${GOLD}; border: 2px solid ${GOLD}; padding: 13px 32px;
+  .btn-outline:hover { background: ${NAVY}; color: white; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(10,31,68,0.2); }; border: 2px solid ${GOLD}; padding: 13px 32px;
     border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
     font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
-  }
-  .btn-outline-gold:hover { background: ${GOLD}; color: ${NAVY}; transform: translateY(-3px); }
-
-  .section-label { font-family: 'Space Grotesk', sans-serif; color: ${GOLD}; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+  }; color: ${NAVY}; transform: translateY(-3px); }; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
   .section-heading { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 52px); font-weight: 900; color: ${NAVY}; line-height: 1.15; }
-  .section-heading-light { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 52px); font-weight: 900; color: white; line-height: 1.15; }
-  .gold-divider { width: 60px; height: 3px; background: linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT}); border-radius: 2px; margin: 16px 0 24px; }
+  .section-heading-light { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 52px); font-weight: 900; color: white; line-height: 1.15; }, ${GOLD_LIGHT}); border-radius: 2px; margin: 16px 0 24px; }
 
   .service-hero-tab {
     padding: 14px 28px; border-radius: 40px; border: 2px solid rgba(212,175,55,0.35);
@@ -222,30 +200,7 @@ const SERVICES_DATA = [
   },
 ];
 
-function useInView(threshold = 0.1) {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, inView];
-}
 
-function AnimSection({ children, style = {}, delay = 0 }) {
-  const [ref, inView] = useInView();
-  return (
-    <div ref={ref} style={{
-      opacity: inView ? 1 : 0,
-      transform: inView ? "translateY(0)" : "translateY(36px)",
-      transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
-      ...style,
-    }}>
-      {children}
-    </div>
-  );
-}
 
 function FAQItem({ q, a }) {
   const [open, setOpen] = useState(false);
@@ -261,7 +216,11 @@ function FAQItem({ q, a }) {
 }
 
 export default function ServicesPage() {
-  useDocumentTitle('Services — AI Automation, Web Dev & SEO');
+  useDocumentMeta({
+    title:       'Services — AI Automation, Web Dev & SEO',
+    description: 'AI agent deployment, high-converting websites, and data-driven SEO strategies tailored for East African businesses. Starting from KES 25,000.',
+    canonical:   '/services',
+  });
   const [activeService, setActiveService] = useState(0);
 
   const svc = SERVICES_DATA[activeService];
@@ -354,6 +313,7 @@ export default function ServicesPage() {
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                   <a href="/#contact"><button className="btn-gold">{svc.ctaText} →</button></a>
                   <a href="/projects"><button className="btn-outline">See Projects</button></a>
+                  <a href="https://neurosparkcorporation.ai" target="_blank" rel="noopener noreferrer"><button className="btn-outline" style={{ fontSize: 13 }}>Book via NeuroSpark ↗</button></a>
                 </div>
               </AnimSection>
 

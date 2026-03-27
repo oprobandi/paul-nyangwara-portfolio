@@ -84,5 +84,6 @@ export function normaliseHashnodePost(node) {
     tags:     node.tags?.map(t => t.name) || [],
     featured: false,
     content:  node.content?.html || null,
+    author:   { name: "Paul Nyang'wara", role: 'Founder & CEO, NeuroSpark Corporation', avatar: '/paul-headshot.jpg' },
   };
 }

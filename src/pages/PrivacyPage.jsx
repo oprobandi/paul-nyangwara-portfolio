@@ -1,9 +1,14 @@
-import { useDocumentTitle } from '../hooks/useDocumentTitle';
-const NAVY = "#0A1F44";
-const GOLD = "#C9A84C";
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
+import AnimSection from '../components/AnimSection';
+import { useInView } from '../hooks/useInView';
+import { NAVY, GOLD } from '../constants'; // ADR-029
 
 export default function PrivacyPage() {
-  useDocumentTitle('Privacy Policy');
+  useDocumentMeta({
+    title:       "Privacy Policy",
+    description: "Privacy policy — how your data is collected, used, and protected on this site.",
+    canonical:   "/privacy",
+  });
   return (
     <div style={{ background: "#f9f7f2", minHeight: "100vh", padding: "80px 24px" }}>
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
