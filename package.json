@@ -1,6 +1,6 @@
 {
   "name": "Paul-portfolio-v6.7",
-  "version": "6.7.2",
+  "version": "6.7.3",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -15,7 +15,7 @@
   },
   "scripts": {
     "dev":          "vite",
-    "build":        "vite build && cp dist/index.html dist/_index.html && vite build --ssr src/entry-server.jsx && mv dist/_index.html dist/index.html && node scripts/prerender.mjs",
+    "build":        "vite build && cp dist/index.html /tmp/_portfolio_index.html && vite build --ssr src/entry-server.jsx && mv /tmp/_portfolio_index.html dist/index.html && node scripts/prerender.mjs",
     "build:client": "vite build",
     "build:server": "vite build --ssr src/entry-server.jsx",
     "preview":      "vite preview"

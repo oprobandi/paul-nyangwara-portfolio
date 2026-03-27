@@ -5,6 +5,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [6.7.3] — 2026-03-27 — Build fix: backup index.html to /tmp
+
+### Problem
+`mv: cannot stat 'dist/_index.html': No such file or directory`
+
+### Root cause
+v6.7.2 backed up `dist/index.html` to `dist/_index.html` — but
+`vite build --ssr` wipes the **entire `dist/` folder**, including the backup.
+The restore step then failed because the file was already gone.
+
+### Fix
+Back up to `/tmp/_portfolio_index.html` (outside `dist/`), which the SSR
+build cannot touch:
+
+```
+vite build
+  → cp dist/index.html /tmp/_portfolio_index.html   ← safe outside dist/
+  → vite build --ssr src/entry-server.jsx            ← wipes dist/ entirely
+  → mv /tmp/_portfolio_index.html dist/index.html    ← restore succeeds ✅
+  → node scripts/prerender.mjs                       ← finds index.html ✅
+```
+
+### Files changed
+- `package.json` — bumped to 6.7.3, updated `build` script backup path
+
+---
+
 ## [6.7.2] — 2026-03-27 — Build fix: shell-level index.html guard
 
 ### Problem
