@@ -4,7 +4,7 @@
  *
  * Runs as the final step of `npm run build`:
  *   vite build                               ← client bundle  → dist/
- *   vite build --ssr src/entry-server.mjsx    ← server bundle  → dist/entry-server.mjs
+ *   vite build --ssr src/entry-server.jsx    ← server bundle  → dist/entry-server.js
  *   node scripts/prerender.mjs               ← this script
  *
  * For each route in ROUTES:
@@ -34,7 +34,7 @@ const root       = resolve(__dirname, '..');
 const toAbs      = (...parts) => resolve(root, ...parts);
 
 /* ── Import the SSR bundle built by `vite build --ssr` ───────────── */
-const { render } = await import(toAbs('dist', 'entry-server.mjs'));
+const { render } = await import(toAbs('dist', 'entry-server.js'));
 
 /* ── Read the client-side HTML template ──────────────────────────── */
 const template = readFileSync(toAbs('dist', 'index.html'), 'utf-8');
