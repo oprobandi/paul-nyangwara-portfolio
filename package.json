@@ -14,10 +14,10 @@
     "vite": "^5.1.4"
   },
   "scripts": {
-    "dev":          "vite",
-    "build":        "vite build && cp dist/index.html /tmp/_portfolio_index.html && vite build --ssr src/entry-server.jsx && mv /tmp/_portfolio_index.html dist/index.html && node scripts/prerender.mjs",
+    "dev": "vite",
+    "build": "vite build",
     "build:client": "vite build",
     "build:server": "vite build --ssr src/entry-server.jsx",
-    "preview":      "vite preview"
+    "preview": "vite preview"
   }
 }
