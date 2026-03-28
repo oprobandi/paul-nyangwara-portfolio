@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 
-import { NAVY, GOLD, GOLD_LIGHT } from '../constants'; // ADR-029
+const NAVY       = "#0A1F44";
+const GOLD       = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 
 const navStyles = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -72,7 +74,6 @@ export default function Navbar() {
   const [scrolled,    setScrolled]    = useState(false);
   const [mobileOpen,  setMobileOpen]  = useState(false);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
@@ -80,18 +81,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* BUG-04: Close mobile menu on every route change, not just mount */
-  useEffect(() => { setMobileOpen(false); }, [pathname]);
+  useEffect(() => { setMobileOpen(false); }, []);
 
   const goToContact = (e) => {
     e.preventDefault();
     if (window.location.pathname === "/") {
       document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
     } else {
-      /* BUG-05: Pass scroll intent via router state instead of a fixed
-         setTimeout. The landing page reads location.state on mount and
-         scrolls once the DOM is ready — reliable on 3G and fast connections. */
-      navigate("/", { state: { scrollTo: "contact" } });
+      navigate("/");
+      setTimeout(() => {
+        document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+      }, 350);
     }
   };
 

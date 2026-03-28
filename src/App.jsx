@@ -1,110 +1,71 @@
 /**
  * App.jsx — Paul Nyang'wara Portfolio Router
- * Paul Nyang'wara Portfolio v6.6
  *
  * Route map:
- *   /            → PaulNyangwaraLanding (Home) — eagerly loaded
- *   /about       → AboutPage            — eagerly loaded
- *   /services    → ServicesPage         — eagerly loaded
- *   /projects    → ProjectsPage         — lazy (ADR-041)
- *   /blog        → BlogPage             — lazy (ADR-041)
- *   /blog/:slug  → BlogPostPage         — lazy (ADR-041)
- *   /skills      → SkillsTestimonialsPage — lazy (ADR-041)
- *   /privacy     → PrivacyPage          — eagerly loaded
- *   /terms       → TermsPage            — eagerly loaded
- *   *            → NotFoundPage (404)
+ *   /          → Landing (Home)
+ *   /about     → About
+ *   /services  → Services
+ *   /projects  → Projects / Case Studies
+ *   /blog      → Blog / Insights
+ *   /skills    → Skills & Testimonials
+ *   *          → 404 Not Found
  *
- * Lazy-loading rationale (ADR-041):
- *   ProjectsPage, SkillsTestimonialsPage, BlogPage, and BlogPostPage are
- *   the four heaviest routes. Wrapping them in React.lazy reduces the
- *   initial JS bundle parsed on first load — meaningful on 3G where Paul's
- *   target audience is. The homepage (PaulNyangwaraLanding) stays eagerly
- *   loaded because it is the most common first-load route and its SSG HTML
- *   must hydrate quickly. Light pages (About, Services, Privacy, Terms)
- *   stay eager because their JS overhead is negligible.
- *
- *   With SSG active (ADR-039/040), Vercel serves pre-rendered HTML before
- *   any JS runs. React.lazy only affects JS bundle size; the visible HTML
- *   is already in the DOM. The Suspense fallback (PageSkeleton) is shown
- *   briefly during client hydration if the lazy chunk hasn't loaded yet.
- *
- * v6.5: BrowserRouter extracted from AppRoutes into App only; entry-server
- *   wraps AppRoutes in StaticRouter for SSG (ADR-039).
- *
- * v6.6 BUG FIX — App.jsx was shipped in v6.5 with a complete duplicate of
- *   its own content appended from line 162 onward. The duplicate contained
- *   a second `export default function App()` (the old pre-v6.5 shape without
- *   the AppRoutes refactor). Vite resolves to the first default export it
- *   encounters, so the duplicate was inert at runtime — but the file would
- *   fail strict ESM parsers and linters, and the dead code was a maintenance
- *   hazard. The duplicate block has been removed entirely in v6.6.
- *   See CHANGELOG [6.6.0] for the full entry.
+ * All routes share Navbar, Footer, and WhatsApp widget via Layout.
+ * vercel.json in the project root handles SPA fallback for Vercel deploys.
  */
 
-import React, { Suspense }        from 'react';
-import { BrowserRouter, Routes, Route, useLocation, Link } from 'react-router-dom';
-import { useEffect }               from 'react';
+import { BrowserRouter, Routes, Route, useLocation, Link } from "react-router-dom";
+import { useEffect } from "react";
 
-import { C } from './constants';
+import Layout                 from "./components/Layout";
+import PaulNyangwaraLanding   from "./pages/PaulNyangwaraLanding";
+import AboutPage              from "./pages/AboutPage";
+import ServicesPage           from "./pages/ServicesPage";
+import ProjectsPage           from "./pages/ProjectsPage";
+import BlogPage               from "./pages/BlogPage";
+import SkillsTestimonialsPage from "./pages/SkillsTestimonialsPage";
+import PrivacyPage            from "./pages/PrivacyPage";
+import TermsPage              from "./pages/TermsPage";
 
-import Layout                from './components/Layout';
-import PaulNyangwaraLanding  from './pages/PaulNyangwaraLanding';
-import AboutPage             from './pages/AboutPage';
-import ServicesPage          from './pages/ServicesPage';
-import PrivacyPage           from './pages/PrivacyPage';
-import TermsPage             from './pages/TermsPage';
-
-/* ── Lazy-loaded heavy routes (ADR-041) ─────────────────────────── */
-const ProjectsPage           = React.lazy(() => import('./pages/ProjectsPage'));
-const SkillsTestimonialsPage = React.lazy(() => import('./pages/SkillsTestimonialsPage'));
-const BlogPage               = React.lazy(() => import('./pages/BlogPage'));
-const BlogPostPage           = React.lazy(() => import('./pages/BlogPostPage'));
-
-/* ── Suspense fallback ───────────────────────────────────────────── */
-function PageSkeleton() {
-  return (
-    <div style={{ minHeight: '100vh', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ width: 48, height: 48, border: `3px solid rgba(201,168,76,0.2)`, borderTopColor: C.gold, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-}
-
-/* ── Scroll to top on every route change ────────────────────────── */
+/* ── Scroll to top on every route change ─────────────────────────── */
 function ScrollReset() {
   const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [pathname]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname]);
   return null;
 }
 
-/* ── 404 Not Found Page ─────────────────────────────────────────── */
-const { navy: NAVY, gold: GOLD, goldLight: GOLD_LIGHT } = C;
+/* ── 404 Not Found Page ──────────────────────────────────────────── */
+const NAVY = "#0A1F44";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
 
 const nfStyles = `
-  @keyframes float404   { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-20px) rotate(2deg)} }
-  @keyframes fadeInUp   { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes pulse      { 0%,100%{opacity:1} 50%{opacity:0.6} }
-  @keyframes gridScroll { from{background-position:0 0} to{background-position:48px 48px} }
+  @keyframes float404 { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-20px) rotate(2deg); } }
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse    { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+  @keyframes gridScroll { from { background-position:0 0; } to { background-position:48px 48px; } }
 
-  .nf-bg  { position:fixed; inset:0; background-image:linear-gradient(rgba(212,175,55,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(212,175,55,0.04) 1px,transparent 1px); background-size:48px 48px; animation:gridScroll 4s linear infinite; }
+  .nf-bg { position:fixed; inset:0; background-image: linear-gradient(rgba(212,175,55,0.04) 1px, transparent 1px), linear-gradient(90deg,rgba(212,175,55,0.04) 1px, transparent 1px); background-size:48px 48px; animation:gridScroll 4s linear infinite; }
   .nf-glow { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(212,175,55,0.07) 0%,transparent 70%); pointer-events:none; }
   .nf-404  { font-family:'Playfair Display',serif; font-size:clamp(120px,20vw,220px); font-weight:900; color:transparent; -webkit-text-stroke:2px rgba(212,175,55,0.25); line-height:1; animation:float404 5s ease-in-out infinite; user-select:none; }
-  .btn-gold-nf  { background:${GOLD}; color:${NAVY}; border:none; padding:16px 40px; border-radius:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-block; }
-  .btn-gold-nf:hover  { background:${GOLD_LIGHT}; transform:translateY(-3px); box-shadow:0 12px 30px rgba(212,175,55,0.4); }
-  .btn-ghost    { background:transparent; color:${GOLD}; border:2px solid ${GOLD}; padding:15px 40px; border-radius:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-block; }
-  .btn-ghost:hover    { background:${GOLD}; color:${NAVY}; transform:translateY(-3px); }
+  .btn-gold-nf { background:${GOLD}; color:${NAVY}; border:none; padding:16px 40px; border-radius:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-block; }
+  .btn-gold-nf:hover { background:${GOLD_LIGHT}; transform:translateY(-3px); box-shadow:0 12px 30px rgba(212,175,55,0.4); }
+  .btn-ghost { background:transparent; color:${GOLD}; border:2px solid ${GOLD}; padding:15px 40px; border-radius:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-block; }
+  .btn-ghost:hover { background:${GOLD}; color:${NAVY}; transform:translateY(-3px); }
   .nf-quick-link { color:rgba(255,255,255,0.5); text-decoration:none; font-size:14px; font-weight:500; transition:color 0.3s; padding:6px 0; font-family:'Space Grotesk',sans-serif; }
   .nf-quick-link:hover { color:${GOLD}; }
 `;
 
 function NotFoundPage() {
   const quickLinks = [
-    { label: 'Home',     to: '/'         },
-    { label: 'About',    to: '/about'    },
-    { label: 'Services', to: '/services' },
-    { label: 'Projects', to: '/projects' },
-    { label: 'Blog',     to: '/blog'     },
-    { label: 'Skills',   to: '/skills'   },
+    { label: "Home",     to: "/"         },
+    { label: "About",    to: "/about"    },
+    { label: "Services", to: "/services" },
+    { label: "Projects", to: "/projects" },
+    { label: "Blog",     to: "/blog"     },
+    { label: "Skills",   to: "/skills"   },
   ];
 
   return (
@@ -112,37 +73,40 @@ function NotFoundPage() {
       <style>{nfStyles}</style>
       <div className="nf-bg" />
       <div className="nf-glow" />
-      <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px 24px', animation: 'fadeInUp 0.8s ease both' }}>
-        <Link to="/" style={{ textDecoration: 'none', marginBottom: 48, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src="/neurospark-logo.jpg" alt="NeuroSpark" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
-          <span style={{ fontFamily: "'Playfair Display',serif", color: 'white', fontSize: 22, fontWeight: 700 }}>
-            Paul <span style={{ color: GOLD }}>Nyang'wara</span>
+
+      <div style={{ position:"relative", zIndex:1, minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 24px", animation:"fadeInUp 0.8s ease both" }}>
+        <Link to="/" style={{ textDecoration:"none", marginBottom:48, display:"flex", alignItems:"center", gap:10 }}>
+          <img src="/neurospark-logo.jpg" alt="NeuroSpark" style={{ width:36, height:36, borderRadius:"50%", objectFit:"cover" }} />
+          <span style={{ fontFamily:"'Playfair Display',serif", color:"white", fontSize:22, fontWeight:700 }}>
+            Paul <span style={{ color:GOLD }}>Nyang'wara</span>
           </span>
         </Link>
 
         <div className="nf-404">404</div>
 
-        <div style={{ fontFamily: "'Space Grotesk',sans-serif", color: GOLD, fontSize: 13, fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', marginBottom: 16, animation: 'pulse 3s ease-in-out infinite' }}>
+        <div style={{ fontFamily:"'Space Grotesk',sans-serif", color:GOLD, fontSize:13, fontWeight:600, letterSpacing:4, textTransform:"uppercase", marginBottom:16, animation:"pulse 3s ease-in-out infinite" }}>
           Page Not Found
         </div>
 
-        <h1 style={{ fontFamily: "'Playfair Display',serif", color: 'white', fontSize: 'clamp(24px,4vw,42px)', fontWeight: 900, lineHeight: 1.2, marginBottom: 16, maxWidth: 500 }}>
-          This Page Doesn't<br /><span style={{ color: GOLD }}>Exist (Yet)</span>
+        <h1 style={{ fontFamily:"'Playfair Display',serif", color:"white", fontSize:"clamp(24px,4vw,42px)", fontWeight:900, lineHeight:1.2, marginBottom:16, maxWidth:500 }}>
+          This Page Doesn't<br /><span style={{ color:GOLD }}>Exist (Yet)</span>
         </h1>
 
-        <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 16, lineHeight: 1.7, maxWidth: 420, marginBottom: 40 }}>
+        <p style={{ color:"rgba(255,255,255,0.6)", fontSize:16, lineHeight:1.7, maxWidth:420, marginBottom:40 }}>
           The page you're looking for has either moved or never existed. But great things are just one click away.
         </p>
 
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 60 }}>
-          <Link to="/"          className="btn-gold-nf">← Back to Home</Link>
-          <a    href="/#contact" className="btn-ghost">Get in Touch</a>
+        <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap", marginBottom:60 }}>
+          <Link to="/" className="btn-gold-nf">← Back to Home</Link>
+          <a href="/#contact" className="btn-ghost">Get in Touch</a>
         </div>
 
-        <div style={{ borderTop: '1px solid rgba(212,175,55,0.15)', paddingTop: 32, maxWidth: 480, width: '100%' }}>
-          <div style={{ fontFamily: "'Space Grotesk',sans-serif", color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: 600, letterSpacing: 2, marginBottom: 16 }}>QUICK NAVIGATION</div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            {quickLinks.map(l => <Link key={l.to} to={l.to} className="nf-quick-link">{l.label}</Link>)}
+        <div style={{ borderTop:"1px solid rgba(212,175,55,0.15)", paddingTop:32, maxWidth:480, width:"100%" }}>
+          <div style={{ fontFamily:"'Space Grotesk',sans-serif", color:"rgba(255,255,255,0.3)", fontSize:11, fontWeight:600, letterSpacing:2, marginBottom:16 }}>QUICK NAVIGATION</div>
+          <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
+            {quickLinks.map(l => (
+              <Link key={l.to} to={l.to} className="nf-quick-link">{l.label}</Link>
+            ))}
           </div>
         </div>
       </div>
@@ -150,40 +114,27 @@ function NotFoundPage() {
   );
 }
 
-/* ── AppRoutes — router-agnostic route tree ──────────────────────
- * Exported separately so entry-server.jsx can wrap it in StaticRouter
- * for SSG pre-rendering (ADR-039/040). main.jsx uses the default App
- * export which wraps this in BrowserRouter for the client.
- * ─────────────────────────────────────────────────────────────── */
-export function AppRoutes() {
-  return (
-    <>
-      <ScrollReset />
-      <Suspense fallback={<PageSkeleton />}>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/"           element={<PaulNyangwaraLanding />}   />
-            <Route path="/about"      element={<AboutPage />}               />
-            <Route path="/services"   element={<ServicesPage />}            />
-            <Route path="/projects"   element={<ProjectsPage />}            />
-            <Route path="/blog"       element={<BlogPage />}                />
-            <Route path="/blog/:slug" element={<BlogPostPage />}            />
-            <Route path="/skills"     element={<SkillsTestimonialsPage />}  />
-            <Route path="/privacy"    element={<PrivacyPage />}             />
-            <Route path="/terms"      element={<TermsPage />}               />
-          </Route>
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Suspense>
-    </>
-  );
-}
-
-/* ── Root App (client) ──────────────────────────────────────────── */
+/* ── Root App ─────────────────────────────────────────────────────── */
 export default function App() {
   return (
     <BrowserRouter>
-      <AppRoutes />
+      <ScrollReset />
+      <Routes>
+        {/* All routes wrapped in shared Layout (Navbar + Footer + WhatsApp) */}
+        <Route element={<Layout />}>
+          <Route path="/"         element={<PaulNyangwaraLanding />}   />
+          <Route path="/about"    element={<AboutPage />}               />
+          <Route path="/services" element={<ServicesPage />}            />
+          <Route path="/projects" element={<ProjectsPage />}            />
+          <Route path="/blog"     element={<BlogPage />}                />
+          <Route path="/skills"   element={<SkillsTestimonialsPage />}  />
+          <Route path="/privacy" element={<PrivacyPage />}              />
+          <Route path="/terms"   element={<TermsPage />}                />
+        </Route>
+
+        {/* 404 — outside Layout so it gets its own full-screen treatment */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -1,22 +1,25 @@
-import { useDocumentMeta } from '../hooks/useDocumentMeta';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useState, useEffect, useRef } from "react";
-import AnimSection from '../components/AnimSection';
-import { useInView } from '../hooks/useInView';
-import { useCountUp } from '../hooks/useCountUp';
 
-import { NAVY, GOLD, GOLD_LIGHT, OFF_WHITE, CHARCOAL } from '../constants'; // ADR-029
+const NAVY = "#0A1F44";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
+const OFF_WHITE = "#F9F8F4";
+const CHARCOAL = "#1A1A2E";
 
 const styles = `
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { font-family: 'DM Sans', sans-serif; background: ${OFF_WHITE}; color: ${CHARCOAL}; overflow-x: hidden; }
-; }
-; border-radius: 3px; }
-to { opacity: 1; transform: translateY(0); } }
-to { opacity: 1; } }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: ${NAVY}; }
+  ::-webkit-scrollbar-thumb { background: ${GOLD}; border-radius: 3px; }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes float { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-14px) rotate(1deg); } }
-50% { box-shadow: 0 0 0 14px rgba(212,175,55,0); } }
+  @keyframes pulse-gold { 0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.7); } 50% { box-shadow: 0 0 0 14px rgba(212,175,55,0); } }
   @keyframes wa-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
@@ -26,14 +29,16 @@ to { opacity: 1; } }
   .nav-link:hover { color: ${GOLD}; }
   .nav-link:hover::after, .nav-link.active::after { width: 100%; }
   .nav-link.active { color: ${GOLD}; }
-; color: ${NAVY}; border: none; padding: 14px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
-; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
-; border: 2px solid ${GOLD}; padding: 13px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; }
-; color: ${NAVY}; transform: translateY(-3px); }
-; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+
+  .btn-gold { background: ${GOLD}; color: ${NAVY}; border: none; padding: 14px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
+  .btn-gold:hover { background: ${GOLD_LIGHT}; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
+  .btn-outline-gold { background: transparent; color: ${GOLD}; border: 2px solid ${GOLD}; padding: 13px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; }
+  .btn-outline-gold:hover { background: ${GOLD}; color: ${NAVY}; transform: translateY(-3px); }
+
+  .section-label { font-family: 'Space Grotesk', sans-serif; color: ${GOLD}; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
   .section-heading { font-family: 'Playfair Display', serif; font-size: clamp(32px,4vw,52px); font-weight: 900; color: ${NAVY}; line-height: 1.15; }
   .section-heading-light { font-family: 'Playfair Display', serif; font-size: clamp(32px,4vw,52px); font-weight: 900; color: white; line-height: 1.15; }
-,${GOLD_LIGHT}); border-radius: 2px; margin: 16px 0 24px; }
+  .gold-divider { width: 60px; height: 3px; background: linear-gradient(90deg,${GOLD},${GOLD_LIGHT}); border-radius: 2px; margin: 16px 0 24px; }
 
   .timeline-item { display: flex; gap: 28px; padding-bottom: 48px; position: relative; }
   .timeline-item::before { content: ''; position: absolute; left: 19px; top: 40px; bottom: 0; width: 2px; background: rgba(212,175,55,0.2); }
@@ -101,30 +106,43 @@ const ACHIEVEMENTS = [
   { icon: "⚡", val: "3yr+", label: "Running NeuroSpark" },
 ];
 
+function useInView(threshold = 0.1) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, inView];
+}
 
+function AnimSection({ children, style = {}, delay = 0 }) {
+  const [ref, inView] = useInView();
+  return (
+    <div ref={ref} style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(36px)", transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`, ...style }}>
+      {children}
+    </div>
+  );
+}
 
 function SkillBar({ name, pct }) {
-  const [ref, display] = useCountUp(pct);
-  const [barRef, inView] = useInView();
+  const [ref, inView] = useInView();
   return (
-    <div className="skill-bar-wrap" ref={barRef}>
+    <div className="skill-bar-wrap" ref={ref}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
         <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 600, color: NAVY }}>{name}</span>
-        <span ref={ref} style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 700, color: GOLD }}>{display}%</span>
+        <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 700, color: GOLD }}>{pct}%</span>
       </div>
       <div className="skill-bar-track">
-        <div className="skill-bar-fill" style={{ width: inView ? `${pct}%` : "0%", transition: "width 1.4s cubic-bezier(0.25,0.8,0.25,1)" }} />
+        <div className="skill-bar-fill" style={{ width: inView ? `${pct}%` : "0%" }} />
       </div>
     </div>
   );
 }
 
 export default function AboutPage() {
-  useDocumentMeta({
-    title:       "About Paul Nyang'wara — Nairobi AI Developer",
-    description: "The story behind NeuroSpark Corporation. Paul's background, timeline, skills, and approach to building AI solutions for African businesses.",
-    canonical:   "/about",
-  });
+  useDocumentTitle("About Paul Nyang'wara — Nairobi AI Developer");
   const [activeSkillCat, setActiveSkillCat] = useState(0);
 
   return (
@@ -152,7 +170,7 @@ export default function AboutPage() {
 
                 {/* Photo */}
                 <div style={{ width: 300, height: 300, borderRadius: "50%", border: `4px solid ${GOLD}`, overflow: "hidden", boxShadow: `0 0 0 10px rgba(212,175,55,0.1), 0 30px 80px rgba(0,0,0,0.4)`, animation: "float 7s ease-in-out infinite", zIndex: 1, flexShrink: 0 }}>
-                  <img src="/paul-headshot.jpg" alt="Paul Nyang'wara" style={{ width: "100%", height: "100%", objectFit: "cover" }} width={480} height={480} />
+                  <img src="/paul-headshot.jpg" alt="Paul Nyang'wara" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
 
                 {/* Floating badge: location */}
@@ -182,7 +200,7 @@ export default function AboutPage() {
                 I'm a Nairobi-born technologist who believes African businesses deserve the same intelligent tools that power Silicon Valley giants — without the Silicon Valley price tag.
               </p>
               <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 15, lineHeight: 1.85, marginBottom: 36 }}>
-                I founded <strong style={{ color: GOLD }}><a href="https://neurosparkcorporation.ai" target="_blank" rel="noopener noreferrer" style={{ color: GOLD, textDecoration: "none" }}>NeuroSpark Corporation</a></strong> to bridge that gap. Since 2022, I've been building AI agents, automation systems, high-converting websites, and SEO strategies for SMEs across Kenya and East Africa — turning complex technology into measurable business outcomes.
+                I founded <strong style={{ color: GOLD }}>NeuroSpark Corporation</strong> to bridge that gap. Since 2022, I've been building AI agents, automation systems, high-converting websites, and SEO strategies for SMEs across Kenya and East Africa — turning complex technology into measurable business outcomes.
               </p>
 
               {/* Quick stats */}

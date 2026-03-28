@@ -1,20 +1,29 @@
-import { useDocumentMeta } from '../hooks/useDocumentMeta';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useState, useEffect, useRef } from "react";
 
-import { NAVY, GOLD, GOLD_LIGHT, OFF_WHITE, CHARCOAL } from '../constants'; // ADR-029
+const NAVY = "#0A1F44";
+const GOLD = "#C9A84C";
+const GOLD_LIGHT = "#b8943e";
+const OFF_WHITE = "#F9F8F4";
+const CHARCOAL = "#1A1A2E";
 
 const styles = `
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { font-family: 'DM Sans', sans-serif; background: ${OFF_WHITE}; color: ${CHARCOAL}; overflow-x: hidden; }
-; }
-; border-radius: 3px; }
-to { opacity: 1; transform: translateY(0); } }
-to { opacity: 1; } }
-50% { box-shadow: 0 0 0 14px rgba(212,175,55,0); } }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: ${NAVY}; }
+  ::-webkit-scrollbar-thumb { background: ${GOLD}; border-radius: 3px; }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.7); } 50% { box-shadow: 0 0 0 14px rgba(212,175,55,0); } }
   @keyframes wa-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-100% { background-position: 600px 0; }
+  @keyframes shimmer {
+    0% { background-position: -600px 0; }
+    100% { background-position: 600px 0; }
   }
 
   .nav-link { color: rgba(255,255,255,0.85); text-decoration: none; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; position: relative; padding-bottom: 4px; transition: color 0.3s; }
@@ -23,18 +32,21 @@ to { opacity: 1; } }
   .nav-link:hover::after { width: 100%; }
   .nav-link.active { color: ${GOLD}; }
   .nav-link.active::after { width: 100%; }
-; color: ${NAVY}; border: none; padding: 14px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
-; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
-; border: 2px solid ${GOLD}; padding: 13px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
-; color: ${NAVY}; transform: translateY(-3px); }
+
+  .btn-gold { background: ${GOLD}; color: ${NAVY}; border: none; padding: 14px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
+  .btn-gold:hover { background: ${GOLD_LIGHT}; transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
+  .btn-outline-gold { background: transparent; color: ${GOLD}; border: 2px solid ${GOLD}; padding: 13px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
+  .btn-outline-gold:hover { background: ${GOLD}; color: ${NAVY}; transform: translateY(-3px); }
   .btn-sm { padding: 8px 20px; font-size: 12px; border-radius: 6px; }
-; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+
+  .section-label { font-family: 'Space Grotesk', sans-serif; color: ${GOLD}; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
   .section-heading { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 52px); font-weight: 900; color: ${NAVY}; line-height: 1.15; }
   .section-heading-light { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 52px); font-weight: 900; color: white; line-height: 1.15; }
-, ${GOLD_LIGHT}); border-radius: 2px; margin: 16px 0 24px; }
-; }
-; color: ${GOLD}; border-color: ${NAVY}; }
-; color: ${GOLD}; }
+  .gold-divider { width: 60px; height: 3px; background: linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT}); border-radius: 2px; margin: 16px 0 24px; }
+
+  .filter-btn { padding: 9px 22px; border-radius: 30px; border: 2px solid rgba(10,31,68,0.15); background: white; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s; color: ${CHARCOAL}; }
+  .filter-btn.active { background: ${NAVY}; color: ${GOLD}; border-color: ${NAVY}; }
+  .filter-btn:hover:not(.active) { border-color: ${GOLD}; color: ${GOLD}; }
 
   .project-card {
     background: white; border-radius: 20px; overflow: hidden;
@@ -78,11 +90,300 @@ to { opacity: 1; } }
 `;
 
 
-import { PROJECTS, CATEGORIES } from '../data/projects';
-import AnimSection from '../components/AnimSection';
-import { useInView } from '../hooks/useInView';
+const PROJECTS = [
+  {
+    id: 1,
+    title: "NeuroBot CRM Agent",
+    category: "AI & Automation",
+    client: "QuickMart Kenya",
+    industry: "Retail",
+    year: "2024",
+    shortDesc: "AI-powered customer relationship agent handling 80% of queries autonomously for a Nairobi retail SME.",
+    img: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80",
+    tags: ["Python", "LangChain", "OpenAI GPT-4", "WhatsApp API", "Supabase"],
+    results: [
+      { val: "80%", label: "Queries Automated" },
+      { val: "3×", label: "Faster Response" },
+      { val: "40%", label: "Cost Reduction" },
+      { val: "98%", label: "Customer Satisfaction" },
+    ],
+    challenge: "QuickMart Kenya's support team was overwhelmed with repetitive customer queries — order status, product availability, return policies — consuming 6+ hours of staff time daily and causing 4-hour average response delays.",
+    solution: "We built a custom LangChain-powered AI agent connected to their inventory and order management system via API. The agent handles natural language queries over WhatsApp and their website chat widget, with smart escalation to human agents for complex issues.",
+    outcome: "Within 60 days of deployment, 80% of queries were handled autonomously. Response time dropped from 4 hours to under 2 minutes. Staff redirected to higher-value activities, and customer satisfaction scores rose to 98%.",
+    techStack: [
+      { name: "LangChain", role: "Agent orchestration & tool calling" },
+      { name: "OpenAI GPT-4", role: "Natural language understanding & generation" },
+      { name: "WhatsApp Business API", role: "Primary communication channel" },
+      { name: "Supabase", role: "Real-time inventory & order data" },
+      { name: "Python / FastAPI", role: "Backend service layer" },
+    ],
+    testimonial: { quote: "NeuroBot has completely transformed how we handle customer service. Paul's team built something we didn't think was possible at our scale.", name: "Amara Osei", role: "Operations Manager, QuickMart Kenya" },
+    featured: true,
+  },
+  {
+    id: 2,
+    title: "SwiftSEO Dashboard",
+    category: "Web Development",
+    client: "NairobiShops.co.ke",
+    industry: "E-Commerce",
+    year: "2024",
+    shortDesc: "Real-time SEO analytics platform giving a Kenyan e-commerce brand live visibility into rankings, traffic, and competitor gaps.",
+    img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+    tags: ["React", "Node.js", "Google Search Console API", "Ahrefs API", "PostgreSQL"],
+    results: [
+      { val: "3×", label: "Traffic Growth" },
+      { val: "#1", label: "Rankings Achieved" },
+      { val: "220%", label: "Organic Revenue" },
+      { val: "60%", label: "Faster Reporting" },
+    ],
+    challenge: "The client was flying blind on their SEO — manually pulling data from 4 different tools every week. Decisions were delayed, opportunities missed, and competitor movements went unnoticed until it was too late.",
+    solution: "Built a unified SEO command centre integrating Google Search Console, Google Analytics 4, and Ahrefs APIs into a single React dashboard. Auto-refreshes daily, flags ranking drops instantly, and generates board-ready PDF reports in one click.",
+    outcome: "Organic traffic tripled in 4 months. The team went from 8 hours weekly on manual reporting to 20 minutes. Three target keywords hit page 1, with one reaching position #1 in the Nairobi market.",
+    techStack: [
+      { name: "React + Recharts", role: "Frontend dashboard & data visualisation" },
+      { name: "Node.js / Express", role: "API aggregation layer" },
+      { name: "Google Search Console API", role: "Rankings & indexing data" },
+      { name: "Ahrefs API", role: "Backlinks & competitor data" },
+      { name: "PostgreSQL", role: "Historical data storage" },
+    ],
+    testimonial: { quote: "We finally understand what's happening with our SEO in real time. The dashboard pays for itself every single month.", name: "Grace Wambui", role: "Marketing Director, NairobiShops.co.ke" },
+    featured: true,
+  },
+  {
+    id: 3,
+    title: "AfriCart E-Commerce Platform",
+    category: "Web Development",
+    client: "AfriCart Ltd.",
+    industry: "Retail / E-Commerce",
+    year: "2024",
+    shortDesc: "Full-stack e-commerce platform with M-Pesa Daraja integration, multi-vendor support, and automated order fulfilment.",
+    img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
+    tags: ["Next.js 14", "M-Pesa Daraja API", "Supabase", "Stripe", "Vercel"],
+    results: [
+      { val: "KES 2M+", label: "GMV in Month 1" },
+      { val: "0", label: "Payment Failures" },
+      { val: "94", label: "Lighthouse Score" },
+      { val: "12s", label: "Avg Checkout Time" },
+    ],
+    challenge: "AfriCart needed a modern e-commerce platform that Kenyan buyers could actually use — M-Pesa first, mobile-first, and fast on 3G connections. Existing templates weren't built for the African market reality.",
+    solution: "Built a ground-up Next.js 14 application with server-side rendering for SEO, M-Pesa STK Push as the primary checkout method, a mobile-optimised UI, and Supabase for real-time inventory. Multi-vendor architecture allows independent sellers to manage their own storefronts.",
+    outcome: "Launched to KES 2 million in GMV in the first month. Zero payment failures across 400+ M-Pesa transactions. Lighthouse performance score of 94. Average checkout time of 12 seconds.",
+    techStack: [
+      { name: "Next.js 14", role: "Full-stack framework with SSR" },
+      { name: "M-Pesa Daraja API", role: "STK Push payments" },
+      { name: "Supabase", role: "Realtime DB, auth & storage" },
+      { name: "Stripe", role: "Card payment fallback" },
+      { name: "Vercel", role: "Deployment & edge network" },
+    ],
+    testimonial: { quote: "Paul built exactly what Kenya's e-commerce market needed. The M-Pesa integration is seamless, and our customers love how fast it is.", name: "Daniel Mwangi", role: "CEO, AfriCart Ltd." },
+    featured: true,
+  },
+  {
+    id: 4,
+    title: "AutoLead AI",
+    category: "AI & Automation",
+    client: "Apex Insurance Brokers",
+    industry: "Financial Services",
+    year: "2024",
+    shortDesc: "Autonomous lead generation and qualification agent that books meetings without human intervention.",
+    img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
+    tags: ["Python", "GPT-4", "LinkedIn API", "Make", "HubSpot CRM"],
+    results: [
+      { val: "5×", label: "Lead Volume" },
+      { val: "40+", label: "Meetings/Month" },
+      { val: "68%", label: "Qual. Rate" },
+      { val: "90%", label: "Time Saved" },
+    ],
+    challenge: "The sales team was spending 30+ hours weekly on manual prospecting, cold outreach, and lead qualification. Despite the effort, only 12% of leads were converting to meetings — a clear data and personalisation problem.",
+    solution: "Built an AI agent that scrapes relevant LinkedIn profiles, researches each prospect using web data, crafts hyper-personalised outreach messages, sends and follows up automatically, qualifies responses using NLP, and books meetings directly into the sales team's calendars via Calendly.",
+    outcome: "Lead volume increased 5× while the team's prospecting time dropped by 90%. Qualified meeting rate jumped from 12% to 68%. The sales team now focuses exclusively on closing, not finding.",
+    techStack: [
+      { name: "Python + Playwright", role: "Prospect research & scraping" },
+      { name: "OpenAI GPT-4", role: "Personalised message generation" },
+      { name: "Make (Integromat)", role: "Workflow orchestration" },
+      { name: "HubSpot CRM", role: "Lead tracking & pipeline management" },
+      { name: "Calendly API", role: "Automated meeting booking" },
+    ],
+    testimonial: { quote: "AutoLead books more qualified meetings in a week than my team used to in a month. It's like having a full-time SDR that never sleeps.", name: "Peter Kamau", role: "Sales Director, Apex Insurance" },
+    featured: false,
+  },
+  {
+    id: 5,
+    title: "CorpSite Redesign",
+    category: "Web Development",
+    client: "Sterling Capital Partners",
+    industry: "Financial Services",
+    year: "2023",
+    shortDesc: "Complete digital rebrand and website overhaul for a Nairobi-based financial advisory firm, tripling enquiries in 90 days.",
+    img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+    tags: ["React", "Framer Motion", "Figma", "WordPress CMS", "Netlify"],
+    results: [
+      { val: "3×", label: "Enquiries" },
+      { val: "72%", label: "Bounce Rate ↓" },
+      { val: "4.2min", label: "Avg Session" },
+      { val: "#1", label: "Local Keyword" },
+    ],
+    challenge: "Sterling's existing website was 7 years old, not mobile responsive, and failing to communicate the premium positioning of their services. High-value prospects were bouncing within 10 seconds. The brand looked dated against newer competitors.",
+    solution: "Complete redesign from brand identity through to development. New visual identity, premium dark-themed website with sophisticated animations, case studies section with clear ROI framing, trust signals from regulators, and a streamlined consultation booking flow.",
+    outcome: "Enquiries tripled within 90 days. Bounce rate dropped 72%. Average session time increased to 4.2 minutes — meaning prospects were reading, not leaving. The firm secured two major corporate clients directly attributing to the new website.",
+    techStack: [
+      { name: "React + Framer Motion", role: "Interactive frontend" },
+      { name: "Figma", role: "UI/UX design & prototyping" },
+      { name: "WordPress Headless CMS", role: "Content management" },
+      { name: "Netlify", role: "Deployment & CDN" },
+      { name: "Google Analytics 4", role: "Conversion tracking" },
+    ],
+    testimonial: { quote: "Within a month of launching the new site, we had more qualified enquiries than the entire previous quarter. The ROI has been extraordinary.", name: "Sarah Odhiambo", role: "Managing Partner, Sterling Capital" },
+    featured: false,
+  },
+  {
+    id: 6,
+    title: "SmartDesk AI Chatbot",
+    category: "AI & Automation",
+    client: "Serena Hotels Kenya",
+    industry: "Hospitality",
+    year: "2023",
+    shortDesc: "24/7 multilingual guest support chatbot integrated across website, WhatsApp, and hotel app handling bookings, FAQs, and concierge requests.",
+    img: "https://images.unsplash.com/photo-1525338078858-d762b5e32f2c?w=800&q=80",
+    tags: ["GPT-4", "WhatsApp API", "Node.js", "LangChain", "MongoDB"],
+    results: [
+      { val: "24/7", label: "Availability" },
+      { val: "85%", label: "Self-Service Rate" },
+      { val: "2min", label: "Response Time" },
+      { val: "4.8★", label: "Guest Rating" },
+    ],
+    challenge: "Guest support was available only during working hours, causing missed booking inquiries overnight and frustrated guests needing immediate assistance. A significant portion of after-hours enquiries were going to competitors.",
+    solution: "A multilingual AI assistant (English, Kiswahili, French) trained on hotel-specific knowledge — room types, amenities, pricing, local activities, policies. Integrated with the reservation system for real-time availability and booking. Escalates to human staff for complaints and VIP requests.",
+    outcome: "85% of guest queries handled without staff involvement. Missed overnight bookings eliminated. Guest satisfaction scores rose to 4.8 stars on TripAdvisor mentions specifically praising responsiveness.",
+    techStack: [
+      { name: "OpenAI GPT-4 + Fine-tuning", role: "Multilingual understanding" },
+      { name: "LangChain", role: "Knowledge base & retrieval" },
+      { name: "WhatsApp Business API", role: "Primary guest channel" },
+      { name: "Node.js / Express", role: "Integration middleware" },
+      { name: "MongoDB", role: "Conversation history & analytics" },
+    ],
+    testimonial: { quote: "SmartDesk handles our late-night guest queries better than some of our junior staff. Paul truly understood the hospitality context.", name: "Njeri Kamau", role: "Guest Experience Manager, Serena Hotels" },
+    featured: false,
+  },
 
+  /* ── NeuroSpark Platform Projects ─────────────────────────────── */
+  {
+    id: 7,
+    title: "HESABU Multi-Agent Compliance Platform",
+    category: "AI Platform",
+    client: "NeuroSpark Corporation",
+    industry: "FinTech / Compliance",
+    year: "2025–2026",
+    shortDesc: "Designed and built a three-agent compliance platform — PESA, MALIPO, KODI — orchestrated by HESABU, handling the full monthly Kenyan employer compliance cycle end-to-end.",
+    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+    tags: ["Multi-Agent AI", "PostgreSQL", "Supabase", "Daraja API", "KRA iTax", "Event-Driven Architecture"],
+    results: [
+      { val: "3", label: "Agents Orchestrated" },
+      { val: "0", label: "Unconfirmed KRA Submissions" },
+      { val: "SHA-256", label: "P10 Audit Chain" },
+      { val: "Multi-tenant", label: "Architecture" },
+    ],
+    challenge: "Kenyan employer compliance spans three disconnected systems: M-Pesa reconciliation (PESA), payroll with live NSSF/AHL/SHA court order monitoring (MALIPO), and P10 generation with KRA iTax filing (KODI). No existing tool orchestrated all three in a single auditable session.",
+    solution: "Designed HESABU — a session manager and orchestrator that coordinates PESA, MALIPO, and KODI through an event bus. Each agent is stateless; HESABU owns all persistent state. The platform monitors live court orders on NSSF/AHL/SHA at every session start and enforces a human gate before any KRA submission.",
+    outcome: "The platform handles the full monthly compliance cycle: M-Pesa reconciliation → payroll computation with live regulatory monitoring → P10 generation with PIN validation → iTax filing with immutable SHA-256 verified audit trail. Zero KRA submissions proceed without explicit employer confirmation.",
+    techStack: [
+      { name: "Multi-Agent Architecture", role: "HESABU orchestrator + 3 specialist agents" },
+      { name: "PostgreSQL + Supabase", role: "Append-only audit tables, row-level security" },
+      { name: "M-Pesa Daraja API", role: "Mobile money transaction fetch & reconciliation" },
+      { name: "KRA iTax Integration", role: "P10 filing with acknowledgement tracking" },
+      { name: "Event-Driven Bus", role: "Agent coordination without direct coupling" },
+    ],
+    testimonial: { quote: "HESABU is the first system I've seen that treats compliance as a workflow, not a checklist. The audit trail alone is worth it.", name: "Paul Nyang'wara", role: "Founder & CEO, NeuroSpark Corporation" },
+    featured: true,
+    link: "https://neurosparkcorporation.ai/platforms/hesabu",
+  },
+  {
+    id: 8,
+    title: "EACTIC — EAC Trade Intelligence Core",
+    category: "AI Platform",
+    client: "NeuroSpark Corporation",
+    industry: "Trade Intelligence",
+    year: "2025",
+    shortDesc: "Built the shared intelligence backend serving three specialist trade agents: BIASHARA, Bidhaa, and ITCCA — providing real-time tariff rates, rules-of-origin verification, and NTB registry queries across EAC, COMESA, AfCFTA, EU-EPA, and AGOA frameworks.",
+    img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80",
+    tags: ["Multi-Agent AI", "EAC Tariff APIs", "Rules-of-Origin Engine", "NTB Registry", "AGOA/EUDR Monitoring"],
+    results: [
+      { val: "5+", label: "Trade Frameworks" },
+      { val: "Live", label: "Tariff Verification" },
+      { val: "54", label: "AfCFTA Countries" },
+      { val: "Real-time", label: "NTB Registry" },
+    ],
+    challenge: "East African trade compliance spans EAC, COMESA, AfCFTA, EU-EPA, and AGOA simultaneously. These frameworks interact — a product might qualify for 0% under COMESA but face 25% CET if origin documentation is incomplete. No single tool verified all frameworks per query.",
+    solution: "Built EACTIC as a shared API backend serving three specialist agents. Per request: confirms HS classification, retrieves applicable frameworks for the origin/destination pair, verifies rules-of-origin qualification, and checks active NTBs at specific border posts. No static rate tables — all data verified at query time from EAC Secretariat, KRA iCMS, URA, TRA, and RRA.",
+    outcome: "Live tariff rates from five East African revenue authorities verified per query. Rules-of-origin engine covers EAC, COMESA, AfCFTA, and EPA simultaneously. NTB registry with field-report confidence scoring at specific border posts. AGOA and EUDR regulatory alerts injected into agent context automatically.",
+    techStack: [
+      { name: "Multi-Agent Architecture", role: "EACTIC serves BIASHARA, Bidhaa, ITCCA agents" },
+      { name: "EAC Secretariat API", role: "Common External Tariff schedule" },
+      { name: "Rules-of-Origin Engine", role: "Transformation rules across 5 frameworks" },
+      { name: "NTB Registry", role: "Non-tariff barrier data with border post scoring" },
+      { name: "AGOA / EUDR Monitor", role: "Regulatory alert injection at session start" },
+    ],
+    testimonial: { quote: "EACTIC answers the question every East African importer asks: 'What rate do I actually pay?' Not the theoretical rate — the actual, verifiable, documentation-complete rate.", name: "Paul Nyang'wara", role: "Founder & CEO, NeuroSpark Corporation" },
+    featured: false,
+    link: "https://neurosparkcorporation.ai/agents/biashara",
+  },
+  {
+    id: 9,
+    title: "HESABU PostgreSQL Schema — Multi-Tenant Compliance Data Store",
+    category: "AI Platform",
+    client: "NeuroSpark Corporation",
+    industry: "Database Architecture",
+    year: "2025",
+    shortDesc: "Designed the full PostgreSQL schema for the HESABU platform: 10 tables with entity-level row-level security, append-only audit tables, and SHA-256 verified file chains linking every payroll run to its KRA acknowledgement.",
+    img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
+    tags: ["PostgreSQL", "Supabase", "Row-Level Security", "UUID", "Append-Only Audit Tables"],
+    results: [
+      { val: "10", label: "Schema Tables" },
+      { val: "RLS", label: "Entity Isolation" },
+      { val: "SHA-256", label: "File Verification" },
+    ],
+    challenge: "Compliance data requires immutability by design, not by convention. Audit tables must be append-only — no UPDATE or DELETE. Multi-tenant accountant access must guarantee zero cross-entity data leakage. Every payroll run must be traceable from initial computation to KRA acknowledgement, linkable 3+ years later.",
+    solution: "Designed 10 PostgreSQL tables with entity-level row-level security (RLS) via Supabase. Implemented append-only event_log_store and audit_log_store tables where UPDATE and DELETE are revoked at the database role level — not just by convention. UUID-keyed immutable event chains link payroll_run_id → P10 checksum → iTax acknowledgement number.",
+    outcome: "Append-only audit chain: every compliance event is immutable and linkable by UUID 3+ years post-filing. Entity isolation via PostgreSQL RLS — zero cross-tenant data leakage by architecture. Full PAYE audit chain: payroll_run_id → P10 SHA-256 checksum → iTax ack, queryable in a single join.",
+    techStack: [
+      { name: "PostgreSQL", role: "Primary data store with schema-level constraints" },
+      { name: "Supabase RLS", role: "Row-level security for multi-tenant isolation" },
+      { name: "UUID Keys", role: "Immutable event chain identifiers" },
+      { name: "Append-Only Tables", role: "No UPDATE/DELETE by database role policy" },
+      { name: "SHA-256 Checksums", role: "P10 file integrity verification" },
+    ],
+    testimonial: { quote: "The schema is the compliance guarantee. If the architecture allows deletion, the audit trail is a fiction. We built it so deletion is impossible.", name: "Paul Nyang'wara", role: "Founder & CEO, NeuroSpark Corporation" },
+    featured: false,
+    link: null,
+  },
+];
 
+const CATEGORIES = ["All", "AI & Automation", "Web Development", "SEO", "AI Platform"];
+
+function useInView(threshold = 0.1) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, inView];
+}
+
+function AnimSection({ children, style = {}, delay = 0 }) {
+  const [ref, inView] = useInView();
+  return (
+    <div ref={ref} style={{
+      opacity: inView ? 1 : 0,
+      transform: inView ? "translateY(0)" : "translateY(36px)",
+      transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
+      ...style,
+    }}>
+      {children}
+    </div>
+  );
+}
 
 function CaseStudyPanel({ project, onClose }) {
   const isOpen = !!project;
@@ -204,11 +505,7 @@ function CaseStudyPanel({ project, onClose }) {
 }
 
 export default function ProjectsPage() {
-  useDocumentMeta({
-    title:       "Projects & Case Studies",
-    description: "Real client results: AI agents, compliance platforms, e-commerce builds, and SEO campaigns for East African businesses.",
-    canonical:   "/projects",
-  });
+  useDocumentTitle('Projects & Case Studies');
   const [filter, setFilter] = useState("All");
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -307,14 +604,9 @@ export default function ProjectsPage() {
                     </div>
                     {/* Content */}
                     <div style={{ order: i % 2 === 0 ? 1 : 0, padding: "40px 36px", background: "white", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+                      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
                         <span style={{ background: `rgba(212,175,55,0.12)`, color: NAVY, border: `1px solid ${GOLD}`, padding: "3px 12px", borderRadius: 20, fontSize: 11, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600 }}>{project.category}</span>
                         <span style={{ background: `rgba(10,31,68,0.06)`, color: "#777", padding: "3px 12px", borderRadius: 20, fontSize: 11, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600 }}>{project.industry}</span>
-                        {project.metric && (
-                          <span style={{ background: GOLD, color: NAVY, padding: "3px 12px", borderRadius: 20, fontSize: 11, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
-                            ★ {project.metric.val} {project.metric.label}
-                          </span>
-                        )}
                       </div>
                       <h3 style={{ fontFamily: "'Playfair Display', serif", color: NAVY, fontSize: 26, fontWeight: 900, marginBottom: 12, lineHeight: 1.2 }}>{project.title}</h3>
                       <p style={{ color: "#666", fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>{project.shortDesc}</p>
@@ -370,13 +662,6 @@ export default function ProjectsPage() {
                     <div style={{ position: "absolute", top: 14, left: 14 }}>
                       <span style={{ background: "rgba(10,31,68,0.85)", color: GOLD, padding: "4px 12px", borderRadius: 20, fontSize: 10, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, backdropFilter: "blur(8px)" }}>{project.category}</span>
                     </div>
-                    {project.metric && (
-                      <div style={{ position: "absolute", bottom: 12, left: 14 }}>
-                        <span style={{ background: GOLD, color: NAVY, padding: "4px 12px", borderRadius: 20, fontSize: 11, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, letterSpacing: 0.3 }}>
-                          {project.metric.val} {project.metric.label}
-                        </span>
-                      </div>
-                    )}
                   </div>
                   <div style={{ padding: "22px 22px 26px", background: filter !== "All" ? "white" : "#0d2450" }}>
                     <h3 style={{ fontFamily: "'Playfair Display', serif", color: filter !== "All" ? NAVY : "white", fontSize: 19, fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>{project.title}</h3>

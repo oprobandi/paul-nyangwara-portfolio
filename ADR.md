@@ -2,394 +2,275 @@
 **Project:** paul-nyangwara-portfolio  
 **Maintained by:** Paul Nyang'wara, NeuroSpark Corporation  
 **Last updated:** March 2026  
-**Versions covered:** v0 – v6.7
+**Versions covered:** v0 – v6.1
+
+> This document is the canonical ADR log for the portfolio website. ADRs 001–012 were
+> reconstructed from source-code diff analysis across all prior zip archives (documented in
+> the March 2026 ADR & Version Report). ADRs 013 onwards are recorded in real time.
+>
+> **ADR Status key:**
+> - `ACCEPTED` — decision in effect, not superseded
+> - `SUPERSEDED` — replaced by a later ADR (referenced inline)
+> - `DEPRECATED` — feature removed
+> - `PROPOSED` — agreed in principle, not yet implemented
 
 ---
 
-## ADR Status Key
-- `ACCEPTED` — in effect, not superseded
-- `SUPERSEDED` — replaced by a later ADR (referenced inline)
-- `DEPRECATED` — feature removed
-- `PROPOSED` — agreed in principle, not yet implemented
-- `IMPLEMENTED` — was PROPOSED, now done
+## Version History (Quick Reference)
+
+| Version | Key Change | ADR(s) |
+|---|---|---|
+| v0 | React + Vite scaffolding, 6 pages, Vercel deploy | ADR-001, ADR-003 |
+| v1-FINAL | Layout wrapper + WhatsApp widget + headshot asset | ADR-002, ADR-007 |
+| v2 | Testimonial avatar representation fix; email → pnyangwara@gmail.com | ADR-008, ADR-012 |
+| v3 | Re-export of v2; no source changes | — |
+| v3-updated | favicon.jpg added to public/ | — |
+| v3.5 (UPDATED-LANDING) | Hero carousel replacing static hero; corridor.jpg | ADR-009 |
+| v4 | Footer social icons (inline SVG); Navbar Home link | ADR-010 |
+| v5 | Privacy + Terms pages; footer legal links + Quick Links nav | ADR-005, ADR-011 |
+| v6 | Quick Links nav row removed from Footer; footer simplified | ADR-011 (superseded) |
+| v6.1 | SEO package; Hashnode blog; 3 new project cards; useDocumentTitle; gold standardisation | ADR-013 – ADR-018 |
 
 ---
 
-## ADR-021 — Vite SSG (Static Site Generation)
-**Status:** IMPLEMENTED (v6.5) ✓ — see ADR-039 and ADR-040 for implementation detail.
-**Status:** ACCEPTED | **Version:** v0
+## ADR-001 — React + Vite as the core framework
+**Status:** ACCEPTED  
+**Version:** v0
 
-React 18 + Vite 5 + React Router v6. No SSR. Rationale: fastest dev iteration, Paul's primary stack, ~150KB gzipped bundle acceptable for Kenyan 3G. Consequences: SEO limited to static meta tags — per-page OG requires SSG (see ADR-021). Alternatives rejected: Next.js (SSR overhead), CRA (deprecated), Astro.
+**Decision:** React 18 + Vite 5 + React Router v6. No SSR framework (no Next.js).
 
----
+**Rationale:** Vite HMR is 10–20× faster than CRA. React Router v6 nested routes map cleanly to the Layout + Pages architecture. Paul's primary stack is React + Vite — zero ramp-up. Bundle size (~150KB gzipped) is acceptable for Kenyan 3G users.
 
-## ADR-002 — Layout wrapper via React Router Outlet
-**Status:** ACCEPTED | **Version:** v1-FINAL
+**Consequences:** SEO limited to static meta tags in index.html. Per-page OG tags require either a custom hook (ADR-006, ADR-013) or migration to Next.js / Vite SSG. All routes share one JS bundle.
 
-`Layout.jsx` wraps all page routes via `<Outlet />`. Single update point for Navbar + Footer changes. Full-bleed pages require a parallel route tree outside Layout.
+**Alternatives rejected:** Next.js 14 (SSR overhead not needed for static portfolio), Create React App (deprecated), Astro (React proficiency advantage outweighed flexibility).
 
----
-
-## ADR-003 — Vercel + SPA rewrite rule
-**Status:** ACCEPTED | **Version:** v0
-
-`vercel.json`: `{ "source": "/(.*)", "destination": "/index.html" }`. Stable and unchanged across all versions. Netlify `_redirects` present in v0 only.
+**Future consideration:** Vite SSG (`vite-plugin-ssg`) would solve per-page OG tags with minimal architecture change. Recommended for v7 if SEO becomes a primary driver.
 
 ---
 
-## ADR-004 — Inline CSS-in-JS over Tailwind or CSS modules
-**Status:** ACCEPTED (partially resolved in v6.2) | **Version:** v0
+## ADR-002 — Layout wrapper via React Router Outlet pattern
+**Status:** ACCEPTED  
+**Version:** v1-FINAL
 
-**Original:** Inline style objects + template-literal `<style>` blocks per component. No CSS framework.
+**Decision:** `Layout.jsx` wraps all page routes using React Router's `<Outlet />` pattern. A single `<Route element={<Layout />}>` parent in `App.jsx` propagates Navbar and Footer to all pages.
 
-**v6.2 resolution:** Shared classes (buttons, labels, keyframes, scrollbar, WCAG focus-visible, reduced-motion) extracted to `src/index.css`. Per-component style blocks retained for page-specific overrides only. Token duplication resolved by `src/constants.js` (ADR-020, now IMPLEMENTED).
+**Rationale:** Single update point for shared UI — touched once, all pages updated. Eliminates version drift between page-level Navbar/Footer imports (which caused the v1 inconsistency that prompted this change).
 
-**Remaining tech debt:** 14 page/component files still declare local `NAVY`, `GOLD` etc. constants that shadow `constants.js`. Full migration to import from `constants.js` is TODO for v7.
+**Consequences:** Full-bleed pages (if needed in future) require a parallel route tree outside the Layout wrapper. Privacy and Terms (v5) reused Layout with zero wiring.
+
+---
+
+## ADR-003 — Vercel deployment with SPA rewrite rule
+**Status:** ACCEPTED  
+**Version:** v0
+
+**Decision:** Deploy to Vercel. `vercel.json` contains a universal SPA rewrite: `{ "source": "/(.*)", "destination": "/index.html" }`. Netlify `_redirects` present in v0 as a fallback — removed from v1 onwards.
+
+**Rationale:** Vercel is Paul's primary deployment platform. The rewrite rule handles all SPA routing edge cases in three lines. `_redirects` removed once Vercel confirmed as sole target.
+
+**Consequences:** All routes resolve server-side to `index.html`; React Router handles client-side matching. `vercel.json` has been unchanged across all versions.
+
+---
+
+## ADR-004 — Inline CSS-in-JS styling over Tailwind or CSS modules
+**Status:** ACCEPTED (with known tech debt — see ADR-013 note)  
+**Version:** v0
+
+**Decision:** Inline style objects + template-literal CSS strings injected via `<style>` tags per component. Design tokens as component-top constants: `const NAVY`, `const GOLD`, etc. No CSS framework, no CSS modules.
+
+**Rationale:** Zero PostCSS/Tailwind configuration overhead. Token consistency enforced at the JS level. Rapid visual iteration without class-name lookups. Style co-location reduces cognitive overhead.
+
+**Known tech debt (from March 2026 UX Audit):** Tokens are duplicated across 14+ files. Template-literal `<style>` blocks are injected per render (SSR-unsafe, but SSR is not used). Google Fonts `@import` inside `<style>` blocks blocks rendering (fixed in v6.1 — see ADR-015).
+
+**Recommended for v7:** Extract shared tokens to `src/constants.js` mirroring NeuroSpark's `C`, `DARK`, and `FONTS` export structure. Replace per-page `@import` with the centralised `index.html` font loading introduced in v6.1.
 
 ---
 
 ## ADR-005 — Legal pages as first-class routes
-**Status:** ACCEPTED | **Version:** v5
+**Status:** ACCEPTED  
+**Version:** v5
 
-`/privacy` and `/terms` as standalone routes. Kenya Data Protection Act 2019 compliance. Formspree requires a privacy policy.
+**Decision:** `PrivacyPage.jsx` and `TermsPage.jsx` registered at `/privacy` and `/terms`. Linked from Footer legal section.
 
----
-
-## ADR-006 — Static meta tags in index.html
-**Status:** SUPERSEDED by ADR-013 + ADR-016 | **Version:** v0–v6
-
-Original: single static `<title>` and OG tags. Superseded: v6.1 added full OG + JSON-LD (ADR-013); v6.2 added `useDocumentMeta` for client-side per-page meta (ADR-016). Full crawler-visible per-page OG delivered via SSG in v6.5 (ADR-021, ADR-039, ADR-040).
+**Rationale:** Kenya Data Protection Act 2019 requires disclosure of data processing purposes. Formspree's terms require a privacy policy. WhatsApp integration routes contact data to a personal number — must be disclosed. First-class routes are directly linkable and indexable; modals are not.
 
 ---
 
-## ADR-007 — WhatsApp floating widget
-**Status:** ACCEPTED | **Version:** v1-FINAL
+## ADR-006 — Static meta tags in index.html — no per-page dynamic meta
+**Status:** SUPERSEDED by ADR-013 (partial)  
+**Version:** v0–v6
 
-`WhatsApp.jsx` always-visible on all pages via Layout. `wa.me/254799644100` with pre-filled message. Shared number with Portfolio AI Assistant — see ADR-A002 for escalation architecture.
+**Decision (original):** Single static `index.html` with one `<title>` and one set of OG tags. No `react-helmet`, no `useDocumentTitle` hook.
 
----
+**Rationale (original):** Homepage OG preview is the dominant sharing scenario. Per-page OG tags require SSR or prerendering.
 
-## ADR-008 — Testimonial avatar African representation requirement
-**Status:** ACCEPTED | **Version:** v2
-
-All testimonial avatars must depict Black African-presenting individuals. Unsplash photos replaced in v2. Recommended future action: replace Unsplash with real client photos (with consent).
+**Superseded by ADR-013:** `useDocumentTitle` hook introduced in v6.1 provides per-page browser tab titles. Full per-page OG/canonical requires further work (see `PROPOSED` ADR-016).
 
 ---
 
-## ADR-009 — Hero carousel replacing static hero
-**Status:** ACCEPTED | **Version:** v3.5
+## ADR-007 — WhatsApp widget as primary real-time contact channel
+**Status:** ACCEPTED  
+**Version:** v1-FINAL
 
-4-slide auto-advancing carousel. `corridor.jpg` on slide 1. Keyboard nav + play/pause.
+**Decision:** Floating `WhatsApp.jsx` widget on all pages via Layout. Links to `wa.me/254799644100` with pre-filled message.
 
-**v6.2 additions:** `aria-live="polite"` region, `aria-label` on `<section>`, `onFocus`/`onBlur` pause-on-focus. WCAG 2.1 AA gap now resolved.
+**Rationale:** WhatsApp penetration in Kenya exceeds 90% among smartphone users. Floating widget is always-visible without interrupting content flow. `wa.me` deep link opens WhatsApp directly on mobile without saving a contact.
 
-**v6.3 resolution (ADR-028):** Slides 2–4 updated to African/Nairobi-context Unsplash photos. Inline comments mark each `bg` field for replacement with real NeuroSpark photoshoot images.
-
----
-
-## ADR-010 — Social icons as inline SVG in Footer
-**Status:** ACCEPTED | **Version:** v4
-
-Inline SVG components: `IconGitHub`, `IconFacebook`, `IconX`, `IconInstagram`. Zero library overhead.
-
-**v6.2 addition:** `IconLinkedIn` added. SOCIALS reordered: LinkedIn → GitHub → X → Instagram → Facebook.
+**Note:** The WhatsApp number is shared between the portfolio widget and the Portfolio AI Assistant. Both route to +254 799 644 100. This is intentional — see Portfolio AI Assistant ADR-A002 for the two-part escalation architecture that prevents a feedback loop.
 
 ---
 
-## ADR-011 — Footer Quick Links nav row: added v5, removed v6
-**Status:** DEPRECATED | **Version:** v5 (added), v6 (removed)
+## ADR-008 — Testimonial avatars: African representation requirement
+**Status:** ACCEPTED  
+**Version:** v2
 
-Quick Links footer nav removed in v6. Footer role: brand closure, legal compliance, social discovery — not navigation.
+**Decision:** All testimonial avatar photos must depict Black African-presenting individuals, consistent with the named Kenyan clients (Amara Osei, Fatima Hassan, David Kiprono).
+
+**Rationale:** Brand alignment with Paul's 'Africa First' principle. Representation consistency — a Kenyan business owner seeing a testimonial attributed to 'David Kiprono' with a non-African avatar loses credibility. Unsplash photos replaced in v2 with African-presenting portraits.
+
+**Future recommendation:** Replace Unsplash avatars with photos of Paul's actual clients (with written consent). Real photos perform significantly better for testimonial credibility and support Google's E-E-A-T (Experience, Expertise, Authority, Trust) signals.
+
+---
+
+## ADR-009 — Hero carousel replacing static single-image hero
+**Status:** ACCEPTED  
+**Version:** v3.5 (UPDATED-LANDING)
+
+**Decision:** 4-slide auto-advancing carousel in `PaulNyangwaraLanding.jsx`. Slides: (1) Paul / Founder intro with `corridor.jpg`, (2) AI & Automation, (3) Web Development, (4) SEO. Keyboard navigation + play/pause control.
+
+**Rationale:** Three distinct services (AI, Web, SEO) cannot share a single hero without one dominating. Four slides allow each service its own headline, accent, copy, and CTA. `corridor.jpg` establishes a premium visual register distinct from generic stock.
+
+**Known gap (from March 2026 UX Audit):** Slides lack `aria-live="polite"` regions and pause-on-focus behaviour required for WCAG 2.1 AA compliance. Carousel images on slides 2–4 use generic Western stock photos — inconsistent with the African-first brand positioning of slide 1. Recommend replacing with African context imagery.
+
+---
+
+## ADR-010 — Social media links with inline SVG icons in Footer
+**Status:** ACCEPTED  
+**Version:** v4
+
+**Decision:** Footer social links use self-contained inline SVG components (`IconGitHub`, `IconFacebook`, `IconX`, `IconInstagram`). No external icon library.
+
+**Rationale:** Inline SVG adds zero bundle overhead, zero network requests, and scales perfectly at all DPR values. Four stable icons do not justify a library import.
+
+**Note:** `lucide-react` is already used in NeuroSpark v2.9. If portfolio dependencies are ever aligned with NeuroSpark, replacing inline SVGs with lucide-react imports would simplify maintenance.
+
+---
+
+## ADR-011 — Footer Quick Links nav row: added in v5, removed in v6
+**Status:** DEPRECATED  
+**Version:** Added v5, removed v6
+
+**Decision (v6):** Footer contains brand logo/name, social icons, tagline, and legal links only. No duplicate site navigation.
+
+**Rationale:** Navbar already provides full site navigation at the top of every page. Duplicating it in the footer adds visual noise without navigation value. Removal simplified `Footer.jsx` from ~200 to ~100 lines with no functional regression.
 
 ---
 
 ## ADR-012 — Contact email: hello@neurospark.co.ke → pnyangwara@gmail.com
-**Status:** ACCEPTED | **Version:** v2
+**Status:** ACCEPTED  
+**Version:** v2
 
-Personal portfolio routes to personal email. `hello@neurospark.co.ke` removed from NeuroSpark site before v2 was built.
+**Decision:** `pnyangwara@gmail.com` is the portfolio contact email from v2 onwards.
 
----
-
-## ADR-013 — v6.1 SEO foundation
-**Status:** ACCEPTED | **Version:** v6.1
-
-Full OG + Twitter/X card + Person + WebSite JSON-LD in `index.html`. `robots.txt` + `sitemap.xml` in `public/`. All canonical URLs reference Vercel deployment slug pending dedicated domain. `# TODO` comments mark all lines requiring domain update.
+**Rationale:** Personal portfolio should route to a personal email. `hello@neurospark.co.ke` implies corporate engagement terms and had also been removed from the live NeuroSpark site by the time v2 was built.
 
 ---
 
-## ADR-014 — Gold colour standardised to NeuroSpark brand
-**Status:** ACCEPTED | **Version:** v6.1
+## ADR-013 — v6.1 SEO foundation package
+**Status:** ACCEPTED  
+**Version:** v6.1
 
-`#D4AF37` → `#C9A84C`, `#F0D060` → `#b8943e`. Zero instances of old values in any file.
+**Decision:** Added full SEO infrastructure to `index.html`: Open Graph tags, Twitter/X card tags, Person + WebSite JSON-LD schema, `robots.txt`, `sitemap.xml`, and `<link rel="canonical">`. All base URLs reference the current Vercel deployment slug pending dedicated domain purchase.
+
+**Rationale:** The portfolio `index.html` previously had only a `<meta name="description">` and `<title>`. No OG tags meant WhatsApp and LinkedIn link previews showed no image or description — a critical deficit for a portfolio being shared via those channels in the Kenyan market. Person schema establishes E-E-A-T signals linking Paul's identity across both the portfolio and `neurosparkcorporation.ai`.
+
+**Consequences:** All canonical URLs and `sameAs` schema entries must be updated when a dedicated domain is purchased. A `# TODO` comment marks every affected line in `index.html`, `robots.txt`, and `sitemap.xml`.
+
+**What remains (PROPOSED ADR-016):** Per-page OG description and canonical tags still not implemented. Requires `useDocumentMeta` hook (see ADR-016).
 
 ---
 
-## ADR-015 — Google Fonts: @import → index.html preconnect
-**Status:** ACCEPTED | **Version:** v6.1
+## ADR-014 — Gold colour standardised to NeuroSpark brand (#C9A84C)
+**Status:** ACCEPTED  
+**Version:** v6.1
 
-`@import` removed from all page `<style>` blocks. Single `<link rel="preconnect">` + `<link rel="stylesheet">` in `index.html`. Eliminates render-blocking font fetch on every route navigation.
+**Decision:** `#D4AF37` (portfolio gold) replaced with `#C9A84C` (NeuroSpark canonical gold) and `#F0D060` (portfolio gold-light) replaced with `#b8943e` across all JSX and JS files. Zero instances of old values remain.
+
+**Rationale (from March 2026 Cross-Project Harmonisation Audit):** NeuroSpark is the primary brand identity — its gold should govern. The difference between `#D4AF37` and `#C9A84C` is visually noticeable side-by-side. A visitor who views both sites experiences a slightly different brand. `#F0D060` was too yellow/washed relative to the NeuroSpark palette.
 
 ---
 
-## ADR-016 — Per-page useDocumentMeta hook
-**Status:** ACCEPTED (client-side) / PROPOSED (crawler-visible, requires ADR-021) | **Version:** v6.1 (partial), v6.2 (full)
+## ADR-015 — Google Fonts loading strategy: @import → index.html preconnect
+**Status:** ACCEPTED  
+**Version:** v6.1
 
-**v6.1:** `useDocumentTitle` — browser tab title only.  
-**v6.2:** Replaced with `useDocumentMeta` — sets `<title>`, `<meta name="description">`, OG tags, Twitter cards, and `<link rel="canonical">` on every route change. All 8 pages wired with distinct title, description, and canonical path.
+**Decision:** Removed all `@import url('https://fonts.googleapis.com/...')` lines from every page component's `<style>` block. Fonts now load via a single `<link rel="preconnect">` + `<link rel="stylesheet">` in `index.html`, loaded once at application start.
 
-**Limitation:** Client-side DOM injection only. WhatsApp/LinkedIn crawlers read the server `<head>` before JS executes — they still see the base `index.html` OG tags. Full fix requires Vite SSG (ADR-021).
+**Rationale (from March 2026 SEO Audit):** `@import` inside a `<style>` block is render-blocking — the browser must download and parse the CSS before it can render the page, significantly increasing First Contentful Paint (FCP) on 3G/4G connections in Kenya (the primary market). The previous approach also loaded the same fonts on every route navigation, compounding the issue. Moving fonts to `index.html` with `preconnect` hints allows the browser to initiate the font connection in parallel with other page resources.
+
+---
+
+## ADR-016 — Per-page useDocumentTitle hook (PROPOSED: useDocumentMeta)
+**Status:** ACCEPTED (partial) / PROPOSED (full implementation)  
+**Version:** v6.1
+
+**Decision (implemented):** `src/hooks/useDocumentTitle.js` sets the browser `<title>` tag per route. All 8 pages wired with distinct, keyword-rich titles.
+
+**Decision (proposed — not yet implemented):** Replace `useDocumentTitle` with a full `useDocumentMeta` hook that also sets per-page `<meta name="description">`, `<meta property="og:description">`, `<meta property="og:url">`, and `<link rel="canonical">` on every route change.
+
+**Why partial is insufficient:** Social media crawlers (WhatsApp, LinkedIn, Twitter/X) read the `<head>` from the server response before JavaScript executes. `useDocumentTitle` updates the DOM client-side — crawlers never see it. Every route therefore still shares the homepage OG description in link previews. Full fix requires either the `useDocumentMeta` hook (client-side only — improves tab titles but not crawler previews) or migration to Vite SSG / Next.js (solves both).
+
+**Recommended implementation:** See `useDocumentMeta` spec in `content-seo-audit.md` §2.2. All required metadata already exists as constants in each page file.
 
 ---
 
 ## ADR-017 — Hashnode blog integration
-**Status:** ACCEPTED | **Version:** v6.1
+**Status:** ACCEPTED  
+**Version:** v6.1
 
-`BlogPage.jsx` fetches from Hashnode GraphQL API via `src/api/hashnode.js`. NeuroSpark is canonical; portfolio renders previews linking back. Graceful fallback to 6 static posts on API failure. Skeleton loading prevents layout shift.
+**Decision:** `BlogPage.jsx` rebuilt to fetch posts from Hashnode GraphQL API via `src/api/hashnode.js`. NeuroSpark's Hashnode publication is the canonical source. Portfolio renders previews; full articles link back to `neurosparkcorporation.ai/blog/<slug>` as the canonical URL.
 
-**Configuration required:** `PUBLICATION_HOST` in `src/api/hashnode.js` must be set before first deploy.
+**Rationale:** Paul maintains a single blog on NeuroSpark. Duplicating content on the portfolio would create duplicate content issues. The portfolio blog serves as a discovery surface — readers are routed to NeuroSpark for full reading, reinforcing the cross-site authority relationship documented in `content-seo-audit.md` §9.
 
----
+**Graceful degradation:** `fetchPosts()` failure falls back silently to 6 static posts. An error banner with a Retry button appears. Skeleton loading cards prevent layout shift during fetch.
 
-## ADR-018 — AI Platform project category
-**Status:** ACCEPTED | **Version:** v6.1
-
-"AI Platform" fifth filter category. Three cards: HESABU, EACTIC, HESABU PostgreSQL Schema. "View Live on NeuroSpark →" button on cards with non-null `link` field.
+**Configuration required:** `PUBLICATION_HOST` constant in `src/api/hashnode.js` must be set to the active Hashnode publication host before deployment.
 
 ---
 
-## ADR-019 — useDocumentMeta full implementation
-**Status:** IMPLEMENTED (v6.2) ✓
+## ADR-018 — New project category: AI Platform
+**Status:** ACCEPTED  
+**Version:** v6.1
 
-Was PROPOSED in v6.1. Implemented as `src/hooks/useDocumentMeta.js` in v6.2. See ADR-016.
+**Decision:** Added "AI Platform" as a fifth filter category in `ProjectsPage.jsx`. Three new project cards added: HESABU Multi-Agent Compliance Platform (featured), EACTIC Trade Intelligence Core, and HESABU PostgreSQL Schema.
 
----
+**Rationale:** The existing categories (AI & Automation, Web Development, SEO) did not accurately represent platform-level systems design work — multi-agent orchestration, compliance infrastructure, and audit-grade database architecture. The injection doc (March 2026) identified these three projects as ready to publish with full case study content.
 
-## ADR-020 — Centralised design tokens: src/constants.js
-**Status:** IMPLEMENTED (v6.2) ✓
-
-Was PROPOSED in v6.1. `src/constants.js` created with `C`, `FONTS`, and named exports. Pages still declare local constants — full import migration is v7 work.
-
----
-
-## ADR-021 — Vite SSG migration
-**Status:** IMPLEMENTED (v6.5) ✓ — see ADR-039 and ADR-040 for implementation detail.
-
-`vite-plugin-ssg` approach was rejected in favour of a bespoke `entry-server.jsx` + `prerender.mjs` pipeline (lighter, no additional dependency). Pre-renders all routes as static HTML at build time. Solves crawler-visible per-page OG tags without Next.js.
-
----
-
-## ADR-022 — React ErrorBoundary
-**Status:** IMPLEMENTED (v6.2) ✓
-
-Was PROPOSED in v6.1. `src/components/ErrorBoundary.jsx` wraps `<App />` in `main.jsx`. Recovery UI: Refresh button + WhatsApp CTA.
-
----
-
-## ADR-023 — useCountUp + useInView from NeuroSpark
-**Status:** IMPLEMENTED (v6.2) ✓
-
-Was PROPOSED in v6.1. `src/hooks/useCountUp.js` and `src/hooks/useInView.js` created. SkillBar components in AboutPage, SkillsTestimonialsPage, and PaulNyangwaraLanding all count up on scroll. `prefers-reduced-motion` respected.
-
----
-
-## ADR-024 — Analytics: Plausible
-**Status:** IMPLEMENTED (v6.3) — commented pending domain ✓
-
-Plausible `<script>` tag added to `index.html` as a commented-out block. Activate by replacing `yourdomain.com` and uncommenting once dedicated domain is purchased. Paul is evaluating Plausible (€9/month, privacy-first, no cookie banner, same tool as NeuroSpark).
-
----
-
-## ADR-025 — Shared CSS in src/index.css
-**Status:** IMPLEMENTED (v6.2) ✓
-
-**Decision:** Extract all shared CSS classes, keyframes, scrollbar styles, and WCAG rules from per-page `<style>` template-literal blocks into `src/index.css`. Loaded once via `main.jsx`.
-
-**What moved to index.css:** `.btn-gold`, `.btn-outline-gold`, `.section-label`, `.gold-divider`, `.tag-pill`, `.filter-btn`, `.skeleton`, scrollbar, all `@keyframes`, animation reveal fallback (`.hidden-anim`), WCAG `focus-visible` outlines for inputs/buttons/links, `prefers-reduced-motion` block.
-
-**Result:** 4,653 chars removed from 5 page files. Page `<style>` blocks now contain only genuine page-specific rules.
-
-**Remaining:** `PaulNyangwaraLanding.jsx` retains a large `<style>` block for carousel-specific CSS (`.carousel-wrap`, `.glass-card`, `.c-arrow`, etc.) — this is page-specific and correctly stays in the component.
-
----
-
-## ADR-026 — Data arrays extracted to src/data/
-**Status:** IMPLEMENTED (v6.2) ✓
-
-**Decision:** `PROJECTS` + `CATEGORIES` extracted to `src/data/projects.js`; `SLIDES`, `PROJECTS`, `SKILLS`, `SKILLS_BARS`, `TESTIMONIALS` extracted to `src/data/landing.js`.
-
----
-
-## ADR-027 — Real client testimonial photos
-**Status:** PROPOSED | **Target:** v7
-
-Replace Unsplash testimonial avatars in `src/data/landing.js` and `SkillsTestimonialsPage.jsx` with real photos of Amara Osei, Fatima Hassan, David Kiprono (and others) under written consent. Real photos measurably improve E-E-A-T.
-
----
-
-## ADR-028 — African context imagery for carousel slides 2–4
-**Status:** IMPLEMENTED (v6.3) ✓
-
-Was PROPOSED in v6.2. Carousel slides 2–4 in `src/data/landing.js` updated from generic Western stock photography to African tech professional, African entrepreneur/workspace, and business analytics desk contexts. All three `bg` fields carry inline `// TODO` comments for replacement with real NeuroSpark photoshoot images.
-
----
-
-## ADR-029 — Full import of constants from src/constants.js
-**Status:** IMPLEMENTED (v6.7) ✓
-
-All local `const NAVY`, `const GOLD`, `const GOLD_LIGHT`, `const OFF_WHITE`, `const CHARCOAL`, and `const DARK_BG` declarations removed from every page and component file. All 12 affected files now import from `src/constants.js`. A `DARK_BG` named export was added to `constants.js` in v6.7 to cover `Footer.jsx`.
-
-**Files migrated in v6.6 (partial):** `PaulNyangwaraLanding.jsx`, `App.jsx` (NotFoundPage), `src/components/SkillBar.jsx`, `src/pages/landing/*.jsx`.
-
-**Files migrated in v6.7 (completion):** `AboutPage.jsx`, `ServicesPage.jsx`, `ProjectsPage.jsx`, `BlogPage.jsx`, `BlogPostPage.jsx`, `SkillsTestimonialsPage.jsx`, `PrivacyPage.jsx`, `TermsPage.jsx`, `Navbar.jsx`, `Footer.jsx`, `WhatsApp.jsx`, `ErrorBoundary.jsx`.
-
-**Note:** `SkillsTestimonialsPage` retains its own local `SkillBar` component — this is intentional. It takes `{ name, pct, tag }` and renders a proficiency badge ("Expert" etc.) alongside the bar, which is distinct from the shared `src/components/SkillBar.jsx` that takes `{ label, pct }`. They are not duplicates; they serve different UI requirements.
-
----
-
-## ADR-030 — City landing pages (Nairobi, Kampala, Dar es Salaam)
-**Status:** PROPOSED | **Target:** v7+
-
-Thin city-specific landing pages for local SEO targeting across East Africa. Initially static, can be dynamic post-SSG migration (ADR-021).
-
----
-
-## ADR-031 — Project card metric badge
-**Status:** IMPLEMENTED (v6.3) ✓
-
-**Decision:** Add a `metric: { val, label }` field to every entry in `src/data/projects.js`. Render as a gold pill badge on the card image (grid cards) and as a highlighted pill in the category row (featured cards). Surfaces the single strongest outcome without requiring the user to open the case study panel.
-
-**Rationale:** TODO #8 from the Content Audit. Quantified outcomes on card faces improve conversion to the full case study. One metric per card is sufficient — the full `results` array remains available inside the panel.
-
----
-
-## ADR-032 — NeuroSpark cross-links from portfolio pages
-**Status:** IMPLEMENTED (v6.3) ✓
-
-**Decision:** `AboutPage.jsx` — "NeuroSpark Corporation" in the bio paragraph is now a hyperlink to `https://neurosparkcorporation.ai`. `ServicesPage.jsx` — "Book via NeuroSpark ↗" third CTA button added to each service card, linking to `https://neurosparkcorporation.ai`. Both use `target="_blank" rel="noopener noreferrer"`.
-
-**Rationale:** TODO #5. Portfolio and NeuroSpark are sibling properties; bidirectional links improve E-E-A-T and give prospects a natural path to the commercial site.
-
----
-
-## ADR-033 — Blog static fallback image refresh
-**Status:** IMPLEMENTED (v6.3) ✓
-
-**Decision:** All 6 `STATIC_POSTS` image URLs in `BlogPage.jsx` replaced with African business / tech-context Unsplash photos aligned to each post's topic. Each `img` field carries an inline comment marking the intended Unsplash subject and a TODO for replacement with branded NeuroSpark navy+gold overlay images.
-
----
-
-## ADR-034 — Dedicated BlogPostPage at /blog/:slug
-**Status:** IMPLEMENTED (v6.4) ✓
-
-**Decision:** Replace the inline `SinglePost` component inside `BlogPage` with a dedicated `BlogPostPage.jsx` route at `/blog/:slug`. This fixes broken blog deep-links (BUG-02), enables correct per-post `useDocumentMeta` (BUG-07), and makes all six static post slugs listed in `sitemap.xml` actually resolve. `STATIC_POSTS` extracted to `src/data/posts.js` and shared between both pages.
-
-**Consequences:** `handlePostClick` in `BlogPage` now calls `navigate('/blog/' + post.slug)`. The `fetchPost` call that was previously lazy-loaded in `SinglePost` is now the primary load mechanism in `BlogPostPage`, with `STATIC_POSTS` as fallback.
-
----
-
-## ADR-035 — Remove dangerouslySetInnerHTML from hero carousel
-**Status:** IMPLEMENTED (v6.4) ✓
-
-**Decision:** `slide.sub` in `landing.js` changed from a raw HTML string (containing `<b>` tags) to a structured array of strings and `{ accent: string }` objects. `PaulNyangwaraLanding` maps this to JSX. Eliminates the XSS vector (SEC-02) and removes the precedent of raw HTML in slide data.
-
-**Consequences:** Any future slide sub-text with inline styling must use the `{ accent }` object format rather than raw HTML tags.
-
----
-
-## ADR-036 — Security response headers via vercel.json
-**Status:** IMPLEMENTED (v6.4) ✓
-
-**Decision:** Add `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy` to all responses via `vercel.json` headers. Defense-in-depth, especially important given the `dangerouslySetInnerHTML` usage (SEC-04).
-
-**Consequences:** The CSP `connect-src` directive must be kept in sync if new external API endpoints are added (e.g. an analytics provider, a new form service).
-
----
-
-## ADR-037 — Newsletter form wired to Formspree
-**Status:** IMPLEMENTED (v6.4) ✓
-
-**Decision:** Newsletter subscribe in `BlogPage` wired to Formspree form `mnjglqvo` (dedicated newsletter form, separate from the contact form `maqdryly`). Fixes the silent fake-success bug (BUG-01) where users saw "You're in!" without any data being collected.
-
----
-
-## ADR-038 — Extract STATIC_POSTS to src/data/posts.js
-**Status:** IMPLEMENTED (v6.4) ✓
-
-**Decision:** `STATIC_POSTS` array moved from `BlogPage.jsx` to `src/data/posts.js` to allow import by both `BlogPage` (list) and `BlogPostPage` (single). Follows the same pattern as `projects.js` and `landing.js` (ADR-018 / TODO #25).
+**CaseStudyPanel change:** A "View Live on NeuroSpark →" outline button now appears above the existing "Start a Similar Project →" CTA for any project with a non-null `link` field. Cards without a link field (e.g. PostgreSQL Schema) show only the existing CTA.
 
 ---
 
 ## Proposed ADRs (Not Yet Implemented)
 
-| # | Decision | Target |
-|---|---|---|
-| ADR-027 | Real client testimonial photos (with consent) | v7 |
-| ADR-030 | City landing pages (Nairobi, Kampala, Dar es Salaam) | v7+ |
+### ADR-019 — useDocumentMeta full implementation (PROPOSED)
+Full per-page meta description, OG, and canonical injection. Unblocks per-page WhatsApp/LinkedIn link previews. See ADR-016 for spec.
+
+### ADR-020 — Centralised design tokens: src/constants.js (PROPOSED)
+Extract `NAVY`, `GOLD`, `GOLD_LIGHT`, `OFF_WHITE`, `CHARCOAL` from 14 individual page files into a single `src/constants.js` export, mirroring NeuroSpark's `constants.js` structure. Eliminates the largest piece of remaining tech debt in the codebase.
+
+### ADR-021 — Vite SSG migration (PROPOSED)
+Migrate from pure SPA to `vite-plugin-ssg` to pre-render all 8 routes as static HTML. This solves the crawler OG tag problem (ADR-016) without requiring Next.js. Recommended for v7 if the portfolio is to be treated as a primary SEO asset rather than just a shared link.
+
+### ADR-022 — React ErrorBoundary wrapper (PROPOSED)
+Wrap `App.jsx` in an `ErrorBoundary` component. Without it, any uncaught React error in the portfolio renders a blank white screen — especially risky if the Hashnode API returns malformed data.
+
+### ADR-023 — useCountUp + useInView from NeuroSpark (PROPOSED)
+Port `useCountUp` and `useInView` hooks from NeuroSpark v3.0 into portfolio. Skill bars and stats currently animate on mount rather than on scroll. NeuroSpark's count-up-on-scroll pattern is significantly more engaging.
+
+### ADR-024 — Analytics: Plausible (PROPOSED)
+Add Plausible Analytics script to `index.html`. Matches NeuroSpark's privacy-first approach (already on Plausible). Required before meaningful SEO measurement is possible.
 
 ---
 
-## ADR-039 — SSG server render entry (entry-server.jsx)
-**Status:** IMPLEMENTED (v6.5) ✓
-
-**Decision:** Create `src/entry-server.jsx` as the Vite SSR build entry. Exports `render(url)` which wraps `AppRoutes` in `StaticRouter` from `react-router-dom/server` and calls `renderToString`. Also owns the static per-route meta map (title, description, OG image) for all 8 page routes and 6 static blog post routes derived from `STATIC_POSTS`. Returns `{ html, meta }` to the prerender script.
-
-**Why a static meta map rather than extracting from the React render?** `useDocumentMeta` lives inside `useEffect` which does not execute during server rendering. The static map is the ground truth for crawler-visible head content; the hook handles client-side navigation as before.
-
-**Consequences:** When a new page route is added, its meta must be added to `ROUTE_META` in `entry-server.jsx` and its path added to `ROUTES` in `prerender.mjs`. When live Hashnode blog posts go live, their slugs and meta should be added to `ROUTES` so Vercel serves pre-rendered HTML for them.
-
----
-
-## ADR-040 — SSG prerender script (scripts/prerender.mjs)
-**Status:** IMPLEMENTED (v6.5) ✓
-
-**Decision:** Create `scripts/prerender.mjs` as the final step of the production build. Imports the compiled `dist/entry-server.js` bundle, reads `dist/index.html` as a template, and for each route: calls `render(url)`, string-replaces all meta tag content with route-specific values via regex, injects the rendered HTML into `<div id="root">`, and writes to `dist/<route>.html`. Outputs `dist/about.html`, `dist/services.html`, `dist/blog/ai-agents-african-smes-2025.html`, etc. Vercel's static file serving takes priority over the SPA rewrite in `vercel.json`, so crawlers receive fully-baked HTML; real users get the SPA which hydrates via `hydrateRoot`.
-
-**Consequences:** Build time increases (two extra Vite passes + Node pre-render). Three-step build script: `vite build && vite build --ssr src/entry-server.jsx && node scripts/prerender.mjs`. Any new routes must be added to the `ROUTES` array in the prerender script. The BASE_URL string in both `entry-server.jsx` and `prerender.mjs` must be updated when the dedicated domain is purchased (same TODO as `useDocumentMeta.js`).
-
----
-
----
-
-## ADR-041 — Lazy-load heavy routes with React.lazy + Suspense
-**Status:** IMPLEMENTED (v6.6) ✓
-
-**Decision:** Wrap `ProjectsPage`, `SkillsTestimonialsPage`, `BlogPage`, and `BlogPostPage` in `React.lazy()` in `App.jsx`. A single `<Suspense>` boundary wraps the full route tree with a `PageSkeleton` fallback (navy background + gold spinner).
-
-**Rationale:** These four pages are the heaviest in the bundle. Lazy-loading them reduces the initial JS parsed on first load — meaningful for 3G users in Paul's target market. The homepage (`PaulNyangwaraLanding`), About, Services, Privacy, and Terms stay eagerly loaded because their JS overhead is negligible or they are frequent first-load targets.
-
-**SSG interaction:** With SSG active (ADR-039/040), Vercel serves pre-rendered HTML before any JS runs. `React.lazy` only affects JS bundle size; the visible HTML is already in the DOM. The `PageSkeleton` fallback is shown briefly if the lazy chunk hasn't loaded by the time React hydrates — which on 3G is a real scenario. A shape-matched skeleton was used rather than a plain spinner to avoid a flash of unstyled fallback.
-
----
-
-## ADR-042 — Split PaulNyangwaraLanding.jsx into sub-components
-**Status:** IMPLEMENTED (v6.6) ✓
-
-**Decision:** Refactor `PaulNyangwaraLanding.jsx` from a monolithic 867-line file into a composition shell (~140 lines) that imports six section components from `src/pages/landing/`:
-
-| File | Responsibility |
-|---|---|
-| `HeroCarousel.jsx` | Carousel + rAF autoplay engine + keyboard nav (230 lines) |
-| `LandingAbout.jsx` | About section + skill bars |
-| `LandingProjects.jsx` | Featured projects grid |
-| `LandingSkills.jsx` | Tech-stack ticker (forward + reverse rows) |
-| `LandingTestimonials.jsx` | Testimonial rotator with dot/arrow nav |
-| `LandingContact.jsx` | Contact form state + Formspree + SOCIALS/CONTACT_INFO data |
-
-The global `<style>` block for shared carousel/card/form CSS classes stays in `PaulNyangwaraLanding.jsx` (injected once at the page root). Sub-components reference these classes via `className`.
-
-**Byproduct:** `SkillBar` extracted to `src/components/SkillBar.jsx` and now imports from `src/constants.js`, eliminating one instance of local colour constant shadowing (ADR-029 partial).
-
----
-
-## ADR-043 — Centralise BASE_URL in src/config.js
-**Status:** IMPLEMENTED (v6.6) ✓
-
-**Decision:** Create `src/config.js` exporting `BASE_URL` and `DEFAULT_IMG`. Remove the three independent `const BASE_URL = '...'` declarations that previously lived in `src/entry-server.jsx`, `scripts/prerender.mjs`, and `src/hooks/useDocumentMeta.js`.
-
-**Rationale:** When the dedicated domain is purchased, updating `BASE_URL` previously required three edits in three files, with no compile-time check that all three stayed in sync. Now it is one edit in one file.
-
-**Consequences:** `prerender.mjs` imports from `../src/config.js` using an ESM static import, which works because the prerender script runs in Node after the build. If the config module is ever made conditional on environment variables (e.g. `VITE_BASE_URL`), the import strategy for the Node script will need revisiting.
-
----
-
-*End of ADR log — Paul Nyang'wara Portfolio v6.7*
+*End of ADR log — Paul Nyang'wara Portfolio v6.1*
